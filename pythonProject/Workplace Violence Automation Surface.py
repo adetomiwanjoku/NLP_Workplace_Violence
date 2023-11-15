@@ -48,13 +48,8 @@ DIR_df
 
 # COMMAND ----------
 
-IRIS_df
-
-# COMMAND ----------
-
-# Load pre-trained BERT model and tokenizer
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-model = BertModel.from_pretrained('bert-base-uncased')
+tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased')
+model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
 
 # COMMAND ----------
 
@@ -83,38 +78,28 @@ sentences_from_file2 = [clean_text(sentence) for sentence in IRIS_df['Descriptio
 
 # COMMAND ----------
 
-
-# Tokenize input sentences with truncation and padding using multilingual tokenizer
-encoded_inputs_file1 = tokenizer(sentences_from_file1, padding=True, truncation=True, return_tensors='pt', max_length=512, add_special_tokens=True)
-encoded_inputs_file2 = tokenizer(sentences_from_file2, padding=True, truncation=True, return_tensors='pt', max_length=512, add_special_tokens=True)
-
-# Compute BERT embeddings for input sentences using multilingual model
-with torch.no_grad():
-    outputs_file1 = model(**encoded_inputs_file1)
-    outputs_file2 = model(**encoded_inputs_file2)
+# Encode sentences to obtain embeddings
+embeddings1 = model.encode(sentences_from_file1, convert_to_tensor=True)
+embeddings2 = model.encode(sentences_from_file2, convert_to_tensor=True)
 
 # COMMAND ----------
 
-embeddings_file1 = outputs_file1.last_hidden_state.mean(dim=1)  # Using mean pooling to get sentence embeddings
-embeddings_file2 = outputs_file2.last_hidden_state.mean(dim=1)
+import pandas as pd
+from sklearn.metrics.pairwise import cosine_similarity
 
-print(embeddings_file1.shape)
-print(embeddings_file2.shape)
-
-# COMMAND ----------
-
-# Extract the embeddings from the model outputs
-embeddings_file1 = outputs_file1.last_hidden_state.mean(dim=1)  # Using mean pooling to get sentence embeddings
-embeddings_file2 = outputs_file2.last_hidden_state.mean(dim=1)  # Using mean pooling to get sentence embeddings
+# Assuming you have 'Location' column in both dataframes
+locations_from_file1 = DIR_df['Borough'].tolist()
+locations_from_file2 = IRIS_df['Borough'].tolist()
 
 # Compute cosine similarity between sentence embeddings
-similarity_matrix = cosine_similarity(embeddings_file1, embeddings_file2)
+similarity_matrix = cosine_similarity(embeddings1, embeddings2)
 
 # Set similarity threshold
 threshold = 0.8
 
-# Find indices of similar reports above the threshold
-similar_reports_indices = [(i, j) for i in range(len(sentences_from_file1)) for j in range(len(sentences_from_file2)) if similarity_matrix[i, j] > threshold]
+# Find indices of similar reports above the threshold with the same location
+similar_reports_indices = [(i, j) for i in range(len(sentences_from_file1)) for j in range(len(sentences_from_file2))
+                            if similarity_matrix[i, j] > threshold and locations_from_file1[i] == locations_from_file2[j]]
 
 # Create DataFrame to store similar reports
 similar_reports_list = []
@@ -124,10 +109,15 @@ for i, j in similar_reports_indices:
         'File2_Index': j,
         'File1_Description': sentences_from_file1[i],
         'File2_Description': sentences_from_file2[j],
-        'Similarity_Score': similarity_matrix[i, j]
+        'Similarity_Score': similarity_matrix[i, j],
+        'Location': locations_from_file1[i]  # Add location information to the result
     })
 
 # Create a DataFrame for similar reports
 similar_reports_df = pd.DataFrame(similar_reports_list)
 
 
+
+# COMMAND ----------
+
+display(similar_reports_df)
