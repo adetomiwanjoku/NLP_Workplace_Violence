@@ -103,3 +103,7 @@ df.to_csv(output_file_path_bart, index=False)
 # Display the DataFrame with BART summaries
 print(df)
 
+
+# COMMAND ----------
+
+display(df)
