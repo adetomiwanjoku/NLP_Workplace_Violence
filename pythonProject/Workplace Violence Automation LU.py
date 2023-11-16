@@ -103,4 +103,6 @@ display(similar_reports_df)
 
 # COMMAND ----------
 
-
+# Save the DataFrame with BART summaries to a new CSV file
+output_file = 'similar_reports_df'  # Replace with your desired output file path
+similar_reports_df.to_csv(output_file, index=False)
