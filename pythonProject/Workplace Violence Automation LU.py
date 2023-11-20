@@ -28,8 +28,13 @@ from sklearn.decomposition import PCA
 
 # COMMAND ----------
 
-df1 = pd.read_csv('output_file_bart.csv', usecols=['Summary_BART'], encoding='latin1')
-df2 = pd.read_csv('20231010_WAASBsampleData.csv', usecols=['DESCRIPTION'], encoding='latin1')
+#df1 = pd.read_csv('output_file_bart.csv', usecols=['Summary_BART'], encoding='latin1')
+#df2 = pd.read_csv('20231010_WAASBsampleData.csv', usecols=['DESCRIPTION'], encoding='latin1')
+
+# COMMAND ----------
+
+df1 = pd.read_csv('output_file_bart_year', usecols = ['Summary_BART'], encoding = 'latin1')
+df2 = pd.read_csv('WAASB_YEAR.csv', usecols = ['DESCRIPTION'], encoding = 'latin1')
 
 # COMMAND ----------
 
@@ -83,7 +88,7 @@ embeddings2 = model.encode(sentences_from_file2, convert_to_tensor=True)
 similarity_matrix = cosine_similarity(embeddings1, embeddings2)
 
 # Set similarity threshold
-threshold = 0.8
+threshold = 0.75
 # Find indices of similar reports above the threshold
 similar_reports_indices = [(i, j) for i in range(len(sentences_from_file1)) for j in range(len(sentences_from_file2)) if similarity_matrix[i, j] > threshold]
 
