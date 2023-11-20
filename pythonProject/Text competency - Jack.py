@@ -19,11 +19,11 @@ description_column = 'DESCRIPTION'
 
 # COMMAND ----------
 
-df[description_column].str.contains(r'weapon|violence', case=False)
+df[description_column].str.contains(r'Male', case=False)
 
 # COMMAND ----------
 
-df[description_column].str.replace(r'threat|violence', '***', case=False)
+df[description_column].str.replace(r'Male', '***', case=False)
 
 # COMMAND ----------
 
@@ -41,7 +41,11 @@ plt.show()
 
 # COMMAND ----------
 
-df[description_column].str.strip()
+df_stripped = df[description_column].str.strip()
+
+# COMMAND ----------
+
+df_stripped
 
 # COMMAND ----------
 
@@ -72,4 +76,4 @@ df['titlecase_description'] = df[description_column].str.title()
 
 # COMMAND ----------
 
-df
+display(df['DESCRIPTION'])

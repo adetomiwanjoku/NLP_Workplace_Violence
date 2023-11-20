@@ -5,6 +5,9 @@
 # MAGIC %pip install gensim
 # MAGIC %pip install semantic-text-similarity
 # MAGIC %pip install torch
+# MAGIC %pip install numpy 
+# MAGIC %pip install matplotlib 
+# MAGIC
 
 # COMMAND ----------
 
@@ -18,6 +21,10 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize 
 import torch
 import os 
+import numpy
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
 
 # COMMAND ----------
 
@@ -106,3 +113,48 @@ display(similar_reports_df)
 # Save the DataFrame with BART summaries to a new CSV file
 output_file = 'similar_reports_df'  # Replace with your desired output file path
 similar_reports_df.to_csv(output_file, index=False)
+
+# COMMAND ----------
+
+
+
+# Assuming embeddings_dataset1 and embeddings_dataset2 are your embeddings
+combined_embeddings = numpy.concatenate((embeddings1, embeddings2), axis=0)
+
+
+# COMMAND ----------
+
+# Using the previously defined scaler
+scaler = StandardScaler()
+scaler.fit(combined_embeddings)
+scaled_combined_data = scaler.transform(combined_embeddings)
+
+
+# COMMAND ----------
+
+n_components = 2
+pca = PCA(n_components=n_components)
+principal_components_combined = pca.fit_transform(scaled_combined_data)
+
+
+# COMMAND ----------
+
+# Assuming dataset1_size and dataset2_size are the sizes of the original datasets
+df1_size = 256
+df2_size = 88
+
+plt.scatter(
+    principal_components_combined[:df1_size, 0], principal_components_combined[:df1_size, 1],
+    label='EIRF Workplace Violence Reports'
+)
+plt.scatter(
+    principal_components_combined[df1_size:, 0], principal_components_combined[df1_size:, 1],
+    label='WAABS Workplace Violence Reports'
+)
+
+plt.title('PCA Plot of NLP Embeddings for Two Datasets')
+plt.xlabel('Principal Component 1')
+plt.ylabel('Principal Component 2')
+plt.legend()
+plt.show()
+
