@@ -33,8 +33,8 @@ from sklearn.decomposition import PCA
 
 # COMMAND ----------
 
-df1 = pd.read_csv('output_file_bart_year.csv', usecols = ['Summary_BART', 'LOCATION'], encoding = 'latin1')
-df2 = pd.read_csv('WAASB_YEAR.csv', usecols = ['DESCRIPTION', 'LOCATION'], encoding = 'latin1')
+df1 = pd.read_csv('eirf.csv', usecols = ['DESCRIPTION', 'LOCATION'], encoding = 'latin1')
+df2 = pd.read_csv('WAASB.csv', usecols = ['DESCRIPTION', 'LOCATION'], encoding = 'latin1')
 
 # COMMAND ----------
 
