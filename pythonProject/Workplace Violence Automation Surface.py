@@ -48,6 +48,10 @@ DIR_df
 
 # COMMAND ----------
 
+IRIS_df['Borough'] = IRIS_df['Borough'].str.title()
+
+# COMMAND ----------
+
 tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased')
 model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
 
@@ -84,8 +88,7 @@ embeddings2 = model.encode(sentences_from_file2, convert_to_tensor=True)
 
 # COMMAND ----------
 
-import pandas as pd
-from sklearn.metrics.pairwise import cosine_similarity
+
 
 # Assuming you have 'Location' column in both dataframes
 locations_from_file1 = DIR_df['Borough'].tolist()
@@ -95,7 +98,7 @@ locations_from_file2 = IRIS_df['Borough'].tolist()
 similarity_matrix = cosine_similarity(embeddings1, embeddings2)
 
 # Set similarity threshold
-threshold = 0.8
+threshold = 0.6
 
 # Find indices of similar reports above the threshold with the same location
 similar_reports_indices = [(i, j) for i in range(len(sentences_from_file1)) for j in range(len(sentences_from_file2))

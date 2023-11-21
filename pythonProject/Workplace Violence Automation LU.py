@@ -12,7 +12,7 @@
 # COMMAND ----------
 
 import pandas as pd
-from sentence_transformers import SentenceTransformer, util
+from sentence_transformers import SentenceTransformer
 from transformers import BertTokenizer
 from transformers import BertTokenizer, BertModel
 from sklearn.metrics.pairwise import cosine_similarity
@@ -33,8 +33,16 @@ from sklearn.decomposition import PCA
 
 # COMMAND ----------
 
-df1 = pd.read_csv('output_file_bart_year', usecols = ['Summary_BART'], encoding = 'latin1')
-df2 = pd.read_csv('WAASB_YEAR.csv', usecols = ['DESCRIPTION'], encoding = 'latin1')
+df1 = pd.read_csv('output_file_bart_year.csv', usecols = ['Summary_BART', 'LOCATION'], encoding = 'latin1')
+df2 = pd.read_csv('WAASB_YEAR.csv', usecols = ['DESCRIPTION', 'LOCATION'], encoding = 'latin1')
+
+# COMMAND ----------
+
+df1
+
+# COMMAND ----------
+
+df2
 
 # COMMAND ----------
 
@@ -61,17 +69,16 @@ def clean_text(text):
     text = text.lower()
     # Tokenize the text
     tokens = word_tokenize(text)
-    # Remove stopwords and custom words
+    # Remove stopwords, including custom stopwords
     filtered_tokens = [word for word in tokens if word not in stop_words]
     # Join tokens back into a cleaned text
     cleaned_text = ' '.join(filtered_tokens)
     return cleaned_text
-  
 
-  
-# Clean and preprocess sentences
+# Example usage
 sentences_from_file1 = [clean_text(sentence) for sentence in df1['Summary_BART'].astype(str).tolist()]
 sentences_from_file2 = [clean_text(sentence) for sentence in df2['DESCRIPTION'].astype(str).tolist()]
+
 
 # COMMAND ----------
 
@@ -106,7 +113,7 @@ for i, j in similar_reports_indices:
 # Create a DataFrame for similar reports
 similar_reports_df = pd.DataFrame(similar_reports_list)
 
-# 
+
 
 # COMMAND ----------
 
