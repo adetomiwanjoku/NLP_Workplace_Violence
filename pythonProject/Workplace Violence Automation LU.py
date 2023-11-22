@@ -90,7 +90,7 @@ embeddings2 = model.encode(sentences_from_file2, convert_to_tensor=True)
 similarity_matrix = cosine_similarity(embeddings1, embeddings2)
 
 # Set similarity threshold
-threshold = 0.75
+threshold = 0.85
 # Find indices of similar reports above the threshold
 similar_reports_indices = [(i, j) for i in range(len(sentences_from_file1)) for j in range(len(sentences_from_file2)) if similarity_matrix[i, j] > threshold]
 
