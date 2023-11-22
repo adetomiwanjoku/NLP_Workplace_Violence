@@ -7,12 +7,11 @@
 # MAGIC %pip install torch
 # MAGIC %pip install numpy 
 # MAGIC %pip install matplotlib 
-# MAGIC
 
 # COMMAND ----------
 
 import pandas as pd
-from sentence_transformers import SentenceTransformer
+from sentence_transformers import SentenceTransformer, util
 from transformers import BertTokenizer
 from transformers import BertTokenizer, BertModel
 from sklearn.metrics.pairwise import cosine_similarity
@@ -28,16 +27,8 @@ from sklearn.decomposition import PCA
 
 # COMMAND ----------
 
-df1 = pd.read_csv('EIRF_YEAR.csv', usecols = ['Description', 'Location'], encoding = 'latin1')
-df2 = pd.read_csv('WAASB.csv', usecols = ['DESCRIPTION', 'LOCATION'], encoding = 'latin1')
-
-# COMMAND ----------
-
-
-# Calculate the percentage of non-null values in the column in one step
-percentage_non_null = (df1['Location'].count() / len(df1['Location'])) * 100
-
-print(f"The percentage of non-null values in the column is: {percentage_non_null:.2f}%")
+df1 = pd.read_csv('output_file_bart.csv', usecols=['Summary_BART', 'LOCATION'], encoding='latin1')
+df2 = pd.read_csv('20231010_WAASBsampleData.csv', usecols=['DESCRIPTION', 'LOCATION'], encoding='latin1')
 
 # COMMAND ----------
 
@@ -64,16 +55,18 @@ def clean_text(text):
     text = text.lower()
     # Tokenize the text
     tokens = word_tokenize(text)
-    # Remove stopwords, including custom stopwords
+    # Remove stopwords and custom words
     filtered_tokens = [word for word in tokens if word not in stop_words]
     # Join tokens back into a cleaned text
     cleaned_text = ' '.join(filtered_tokens)
     return cleaned_text
 
-# Example usage
-sentences_from_file1 = [clean_text(sentence) for sentence in df1['Description'].astype(str).tolist()]
-sentences_from_file2 = [clean_text(sentence) for sentence in df2['DESCRIPTION'].astype(str).tolist()]
+# COMMAND ----------
 
+
+# Clean and preprocess sentences
+sentences_from_file1 = [clean_text(sentence) for sentence in df1['Summary_BART'].astype(str).tolist()]
+sentences_from_file2 = [clean_text(sentence) for sentence in df2['DESCRIPTION'].astype(str).tolist()]
 
 # COMMAND ----------
 
@@ -81,16 +74,14 @@ sentences_from_file2 = [clean_text(sentence) for sentence in df2['DESCRIPTION'].
 embeddings1 = model.encode(sentences_from_file1, convert_to_tensor=True)
 embeddings2 = model.encode(sentences_from_file2, convert_to_tensor=True)
 
-
 # COMMAND ----------
-
 
 
 # Compute cosine similarity between sentence embeddings
 similarity_matrix = cosine_similarity(embeddings1, embeddings2)
 
 # Set similarity threshold
-threshold = 0.75
+threshold = 0.8
 # Find indices of similar reports above the threshold
 similar_reports_indices = [(i, j) for i in range(len(sentences_from_file1)) for j in range(len(sentences_from_file2)) if similarity_matrix[i, j] > threshold]
 
@@ -108,8 +99,6 @@ for i, j in similar_reports_indices:
 # Create a DataFrame for similar reports
 similar_reports_df = pd.DataFrame(similar_reports_list)
 
-
-
 # COMMAND ----------
 
 display(similar_reports_df)
@@ -117,51 +106,18 @@ display(similar_reports_df)
 
 # COMMAND ----------
 
-# Save the DataFrame with BART summaries to a new CSV file
-output_file = 'similar_reports_df'  # Replace with your desired output file path
-similar_reports_df.to_csv(output_file, index=False)
+
+# Calculate the percentage of non-null values in the column in one step
+percentage_non_null = (df1['LOCATION'].count() / len(df1['LOCATION'])) * 100
+
+print(f"The percentage of non-null values in the column is: {percentage_non_null:.2f}%")
 
 # COMMAND ----------
 
 
+# Calculate the percentage of non-null values in the column in one step
+percentage_non_null = (df2['LOCATION'].count() / len(df2['LOCATION'])) * 100
 
-# Assuming embeddings_dataset1 and embeddings_dataset2 are your embeddings
-#combined_embeddings = numpy.concatenate((embeddings1, embeddings2), axis=0)
+print(f"The percentage of non-null values in the column is: {percentage_non_null:.2f}%")
 
-
-# COMMAND ----------
-
-# Using the previously defined scaler
-#scaler = StandardScaler()
-#scaler.fit(combined_embeddings)
-#scaled_combined_data = scaler.transform(combined_embeddings)
-
-
-# COMMAND ----------
-
-#n_components = 2
-#pca = PCA(n_components=n_components)
-#principal_components_combined = pca.fit_transform(scaled_combined_data)
-
-
-# COMMAND ----------
-
-# Assuming dataset1_size and dataset2_size are the sizes of the original datasets
-#df1_size = 256
-#df2_size = 88
-
-#plt.scatter(
-    #principal_components_combined[:df1_size, 0], principal_components_combined[:df1_size, 1],
-    #label='EIRF Workplace Violence Reports'
-)
-#plt.scatter(
-    #principal_components_combined[df1_size:, 0], principal_components_combined[df1_size:, 1],
-    #label='WAABS Workplace Violence Reports'
-)
-
-#plt.title('PCA Plot of NLP Embeddings for Two Datasets')
-#plt.xlabel('Principal Component 1')
-#plt.ylabel('Principal Component 2')
-#plt.legend()
-#plt.show()
 

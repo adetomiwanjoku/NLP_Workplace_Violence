@@ -18,23 +18,12 @@ import torch
 
 # COMMAND ----------
 
-# Text to summarize
-original_text = pd.read_csv('EIRF_YEAR', encoding='latin1', usecols = ['DESCRIPTION'])
-
-# COMMAND ----------
-
-# Parsing the text string using PlaintextParser
-#nltk.download('punkt')
-#parser=PlaintextParser.from_string(original_text,Tokenizer('english'))
-
-# COMMAND ----------
-
 
 from transformers import BartForConditionalGeneration, BartTokenizer, BartConfig
 
 
 # Read the CSV file into a DataFrame
-df = pd.read_csv('EIRF_YEAR', encoding = 'latin')
+df = pd.read_csv('EIRF_YEAR.csv', encoding = 'latin')
 
 # Tokenizer and Model for BART
 tokenizer = BartTokenizer.from_pretrained('facebook/bart-large-cnn')
@@ -48,11 +37,11 @@ def summarize_text_bart(text):
     return summary
 
 # Apply the BART summarization function to the 'Description' column
-df['Summary_BART'] = df['DESCRIPTION'].apply(summarize_text_bart)
+df['Summary_BART'] = df['Description'].apply(summarize_text_bart)
 
 # Save the DataFrame with BART summaries to a new CSV file
 output_file_path_bart = 'output_file_bart_year.csv'  # Replace with your desired output file path
-df.to_csv(output_file_path_bart, index=False)
+df.to_csv(output_file_path_bart_year, index=False)
 
 # Display the DataFrame with BART summaries
 print(df)
