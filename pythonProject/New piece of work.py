@@ -92,8 +92,55 @@ similarity_matrix = cosine_similarity(embeddings1)
 threshold = 0.85
 
 # Find indices of similar reports above the threshold with the same location
-similar_reports_indices = [(i, j) for i in range(len(sentences_from_file1)) for j in range(i + 1, len(sentences_from_file1)) if
-                            (similarity_matrix[i, j] > threshold) and (df1['LOCATION'].iloc[i] == df1['LOCATION'].iloc[j])]
+similar_reports_indices = [
+    (i, j) 
+    for i in range(len(sentences_from_file1)) 
+    for j in range(i + 1, len(sentences_from_file1)) 
+    if (similarity_matrix[i, j] > threshold) and (df1['LOCATION'].iloc[i] == df1['LOCATION'].iloc[j])
+]
+
+# Create a DataFrame for similar reports
+similar_reports_df = pd.DataFrame([
+    {
+        'File1_Index': df1.index[i],
+        'File2_Index': df1.index[j],
+        'File1_Description': sentences_from_file1[i],
+        'File2_Description': sentences_from_file1[j],
+        'Similarity_Score': similarity_matrix[i, j],
+        'Location': df1['LOCATION'].iloc[i]
+    }
+    for i, j in similar_reports_indices
+])
+
+# Display the DataFrame
+print(similar_reports_df)
+
+
+
+# COMMAND ----------
+
+import pandas as pd
+from sklearn.metrics.pairwise import cosine_similarity
+
+# Assuming you have embeddings, sentences_from_file, and your DataFrame df defined
+# df should have a 'Location' column
+
+# Reset the index of df1
+df1 = df1.reset_index(drop=True)
+
+# Compute cosine similarity between sentence embeddings
+similarity_matrix = cosine_similarity(embeddings1)
+
+# Set similarity threshold
+threshold = 0.85
+
+# Find indices of similar reports above the threshold with the same location
+similar_reports_indices = [
+    (i, j)
+    for i in range(len(sentences_from_file1))
+    for j in range(i + 1, len(sentences_from_file1))
+    if (similarity_matrix[i, j] > threshold) and (df1['LOCATION'].iloc[i] == df1['LOCATION'].iloc[j])
+]
 
 # Create a DataFrame for similar reports
 similar_reports_df = pd.DataFrame([
@@ -108,9 +155,27 @@ similar_reports_df = pd.DataFrame([
     for i, j in similar_reports_indices
 ])
 
-# Display the DataFrame
+# Add new index columns for each file index that adds two to the existing index
+similar_reports_df['New_File1_Index'] = similar_reports_df['File1_Index'] + 2
+similar_reports_df['New_File2_Index'] = similar_reports_df['File2_Index'] + 2
+
+# Display the updated DataFrame
 print(similar_reports_df)
 
+
+
+
+
+
+# COMMAND ----------
+
+# Drop the old file index columns
+similar_reports_df = similar_reports_df.drop(['File1_Index', 'File2_Index'], axis=1)
+
+# Reorder columns with the new index as the first column
+similar_reports_df = similar_reports_df[['New_File1_Index', 'New_File2_Index', 'File1_Description', 'File2_Description', 'Similarity_Score', 'Location']]
+
+# Display the updated DataFrame
 
 # COMMAND ----------
 
