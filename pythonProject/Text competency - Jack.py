@@ -7,7 +7,8 @@
 
 # COMMAND ----------
 
-# Workplace violence is a serious threat to the well-being our operational coleagues. There are various report froms that the staff can record the incidents they are involved. The Electronic Incidence Report form is the main reporting tool used to report violence for London Undergrouns staff. 
+# MAGIC %md
+# MAGIC Workplace violence is a serious threat to the well-being our operational coleagues. There are various report froms that the staff can record the incidents they are involved. The Electronic Incidence Report form is the main reporting tool used to report violence for London Underground staff. 
 
 # COMMAND ----------
 
@@ -42,6 +43,10 @@ df['violence_related'] = df['DESCRIPTION'].apply(lambda x: bool(re.search(patter
 
 # COMMAND ----------
 
+display(df)
+
+# COMMAND ----------
+
 df['violence_related'].mean() * 100
 
 # COMMAND ----------
@@ -71,6 +76,10 @@ df_stripped
 # Fuzzy Matching
 reference_description = "Physical altercation in the workplace"
 df['fuzzy_similarity_to_reference'] = df[description_column].apply(lambda x: fuzz.ratio(x, reference_description)) 
+
+# COMMAND ----------
+
+display(df)
 
 # COMMAND ----------
 

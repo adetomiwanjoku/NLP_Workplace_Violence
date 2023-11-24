@@ -1,4 +1,8 @@
 # Databricks notebook source
+# Install Packages
+
+# COMMAND ----------
+
 # MAGIC %pip install sentence-transformers
 # MAGIC %pip install pandas
 # MAGIC %pip install nltk 
@@ -7,6 +11,10 @@
 # MAGIC %pip install torch
 # MAGIC %pip install numpy 
 # MAGIC %pip install matplotlib 
+
+# COMMAND ----------
+
+# Import functions 
 
 # COMMAND ----------
 
@@ -27,16 +35,34 @@ from sklearn.decomposition import PCA
 
 # COMMAND ----------
 
-df1 = pd.read_csv('Week_Data.csv', usecols = ['DESCRIPTION', 'LOCATION'], encoding = 'latin1')
+# Read in week's worth of workplace violence reports 
 
 # COMMAND ----------
 
-df1.head()
+df1 = pd.read_csv('Week_Data.csv', encoding = 'latin1')
+
+# COMMAND ----------
+
+display(df1)
+
+# COMMAND ----------
+
+# Assuming your DataFrame is similar_reports_df
+df1 = df1.rename(columns={'ï»¿Data Ref Num': 'Reference_Number'})
+
+
+# COMMAND ----------
+
+# Define the model and the tokenizer 
 
 # COMMAND ----------
 
 tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased')
 model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
+
+# COMMAND ----------
+
+# Data pre-processing 
 
 # COMMAND ----------
 
@@ -73,57 +99,29 @@ sentences_from_file1 = [clean_text(sentence) for sentence in df1['DESCRIPTION'].
 
 # COMMAND ----------
 
+sentences_from_file1 # look into this 
+
+# COMMAND ----------
+
+# Embeds the tokens 
+
+# COMMAND ----------
+
 # Encode sentences to obtain embeddings
 embeddings1 = model.encode(sentences_from_file1, convert_to_tensor=True)
 
 
 # COMMAND ----------
 
-import pandas as pd
-from sklearn.metrics.pairwise import cosine_similarity
-
-# Assuming you have embeddings, sentences_from_file, and your DataFrame df defined
-# df should have a 'Location' column
-
-# Compute cosine similarity between sentence embeddings
-similarity_matrix = cosine_similarity(embeddings1)
-
-# Set similarity threshold
-threshold = 0.85
-
-# Find indices of similar reports above the threshold with the same location
-similar_reports_indices = [
-    (i, j) 
-    for i in range(len(sentences_from_file1)) 
-    for j in range(i + 1, len(sentences_from_file1)) 
-    if (similarity_matrix[i, j] > threshold) and (df1['LOCATION'].iloc[i] == df1['LOCATION'].iloc[j])
-]
-
-# Create a DataFrame for similar reports
-similar_reports_df = pd.DataFrame([
-    {
-        'File1_Index': df1.index[i],
-        'File2_Index': df1.index[j],
-        'File1_Description': sentences_from_file1[i],
-        'File2_Description': sentences_from_file1[j],
-        'Similarity_Score': similarity_matrix[i, j],
-        'Location': df1['LOCATION'].iloc[i]
-    }
-    for i, j in similar_reports_indices
-])
-
-# Display the DataFrame
-print(similar_reports_df)
-
-
+embeddings1 # looj 
 
 # COMMAND ----------
 
-import pandas as pd
-from sklearn.metrics.pairwise import cosine_similarity
+# Identify duplicates using threshold with cosine similarity 
 
-# Assuming you have embeddings, sentences_from_file, and your DataFrame df defined
-# df should have a 'Location' column
+# COMMAND ----------
+
+
 
 # Reset the index of df1
 df1 = df1.reset_index(drop=True)
@@ -147,8 +145,8 @@ similar_reports_df = pd.DataFrame([
     {
         'File1_Index': i,
         'File2_Index': j,
-        'File1_Description': sentences_from_file1[i],
-        'File2_Description': sentences_from_file1[j],
+        'Description': sentences_from_file1[i],
+        'Duplicate': sentences_from_file1[j],
         'Similarity_Score': similarity_matrix[i, j],
         'Location': df1['LOCATION'].iloc[i]
     }
@@ -156,11 +154,8 @@ similar_reports_df = pd.DataFrame([
 ])
 
 # Add new index columns for each file index that adds two to the existing index
-similar_reports_df['New_File1_Index'] = similar_reports_df['File1_Index'] + 2
-similar_reports_df['New_File2_Index'] = similar_reports_df['File2_Index'] + 2
-
-# Display the updated DataFrame
-print(similar_reports_df)
+similar_reports_df['Row_Num'] = similar_reports_df['File1_Index'] + 2
+similar_reports_df['Row_Num_Duplicate'] = similar_reports_df['File2_Index'] + 2
 
 
 
@@ -172,11 +167,64 @@ print(similar_reports_df)
 # Drop the old file index columns
 similar_reports_df = similar_reports_df.drop(['File1_Index', 'File2_Index'], axis=1)
 
-# Reorder columns with the new index as the first column
-similar_reports_df = similar_reports_df[['New_File1_Index', 'New_File2_Index', 'File1_Description', 'File2_Description', 'Similarity_Score', 'Location']]
 
-# Display the updated DataFrame
+# COMMAND ----------
+
+
+# Add a column called 'Duplicate_Reference_Number'
+similar_reports_df['Duplicate_Reference_Number'] = similar_reports_df['Row_Num_Duplicate'].apply(
+    lambda file2_index: df1.iloc[file2_index - 2]['Reference_Number']
+)
+# Add an empty column called 'is_duplicate'
+similar_reports_df['Is_Duplicate'] = ''
+
+
+# COMMAND ----------
+
+similar_reports_df.columns
+
+# COMMAND ----------
+
+similar_reports_df['Similarity_Score_Percent'] = (similar_reports_df['Similarity_Score'] * 100).round()
+
+
+# COMMAND ----------
+
+# Reorder columns with the new index as the first column
+similar_reports_df = similar_reports_df[['Row_Num', 'Row_Num_Duplicate', 'Description', 'Duplicate', 'Duplicate_Reference_Number', 'Location', 'Similarity_Score_Percent', 'Is_Duplicate']]
 
 # COMMAND ----------
 
 display(similar_reports_df)
+
+# COMMAND ----------
+
+combined_embeddings = numpy.concatenate((embeddings1), axis=0)
+
+# COMMAND ----------
+
+# Using the previously defined scaler
+scaler = StandardScaler()
+scaler.fit(combined_embeddings)
+scaled_combined_data = scaler.transform(combined_embeddings)
+
+# COMMAND ----------
+
+n_components = 2
+pca = PCA(n_components=n_components)
+principal_components_combined = pca.fit_transform(scaled_combined_data)
+
+# COMMAND ----------
+
+
+
+plt.scatter(
+    principal_components_combined[:df1_size, 0], principal_components_combined[:df1_size, 1],
+    label='Workplace Violence Reports'
+)
+
+plt.title('PCA Plot of NLP Embeddings for Two Datasets')
+plt.xlabel('Principal Component 1')
+plt.ylabel('Principal Component 2')
+plt.legend()
+plt.show()
