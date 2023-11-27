@@ -195,7 +195,7 @@ similar_reports_df = similar_reports_df[['Row_Num', 'Row_Num_Duplicate', 'Descri
 
 # COMMAND ----------
 
-display(similar_reports_df)
+similar_reports_df.tail(5)
 
 # COMMAND ----------
 
