@@ -1,5 +1,6 @@
 # Databricks notebook source
-# Install Packages
+# MAGIC %md
+# MAGIC # Install Packages
 
 # COMMAND ----------
 
@@ -14,7 +15,8 @@
 
 # COMMAND ----------
 
-# Import functions 
+# MAGIC %md
+# MAGIC # Import functions 
 
 # COMMAND ----------
 
@@ -35,11 +37,12 @@ from sklearn.decomposition import PCA
 
 # COMMAND ----------
 
-# Read in week's worth of workplace violence reports 
+# MAGIC %md
+# MAGIC # Read in week's worth of workplace violence reports 
 
 # COMMAND ----------
 
-df1 = pd.read_csv('Week_Data.csv', encoding = 'latin1')
+df1 = pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Data/Week_Data.csv', encoding = 'latin1')
 
 # COMMAND ----------
 
@@ -53,7 +56,8 @@ df1 = df1.rename(columns={'ï»¿Data Ref Num': 'Reference_Number'})
 
 # COMMAND ----------
 
-# Define the model and the tokenizer 
+# MAGIC %md
+# MAGIC # Define the model and the tokenizer 
 
 # COMMAND ----------
 
@@ -62,7 +66,8 @@ model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
 
 # COMMAND ----------
 
-# Data pre-processing 
+# MAGIC %md
+# MAGIC # Data pre-processing 
 
 # COMMAND ----------
 
@@ -103,7 +108,8 @@ sentences_from_file1 # look into this
 
 # COMMAND ----------
 
-# Embeds the tokens 
+# MAGIC %md
+# MAGIC # Embeds the tokens 
 
 # COMMAND ----------
 
@@ -117,7 +123,8 @@ embeddings1 # looj
 
 # COMMAND ----------
 
-# Identify duplicates using threshold with cosine similarity 
+# MAGIC %md
+# MAGIC # Identify duplicates using threshold with cosine similarity 
 
 # COMMAND ----------
 
@@ -164,6 +171,11 @@ similar_reports_df['Row_Num_Duplicate'] = similar_reports_df['File2_Index'] + 2
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC # Create Output File 
+
+# COMMAND ----------
+
 # Drop the old file index columns
 similar_reports_df = similar_reports_df.drop(['File1_Index', 'File2_Index'], axis=1)
 
@@ -196,35 +208,3 @@ similar_reports_df = similar_reports_df[['Row_Num', 'Row_Num_Duplicate', 'Descri
 # COMMAND ----------
 
 similar_reports_df.tail(5)
-
-# COMMAND ----------
-
-combined_embeddings = numpy.concatenate((embeddings1), axis=0)
-
-# COMMAND ----------
-
-# Using the previously defined scaler
-scaler = StandardScaler()
-scaler.fit(combined_embeddings)
-scaled_combined_data = scaler.transform(combined_embeddings)
-
-# COMMAND ----------
-
-n_components = 2
-pca = PCA(n_components=n_components)
-principal_components_combined = pca.fit_transform(scaled_combined_data)
-
-# COMMAND ----------
-
-
-
-plt.scatter(
-    principal_components_combined[:df1_size, 0], principal_components_combined[:df1_size, 1],
-    label='Workplace Violence Reports'
-)
-
-plt.title('PCA Plot of NLP Embeddings for Two Datasets')
-plt.xlabel('Principal Component 1')
-plt.ylabel('Principal Component 2')
-plt.legend()
-plt.show()
