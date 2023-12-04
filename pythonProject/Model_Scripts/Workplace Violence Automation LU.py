@@ -1,13 +1,20 @@
 # Databricks notebook source
+# Install Packages 
+
+# COMMAND ----------
+
 # MAGIC %pip install sentence-transformers
 # MAGIC %pip install pandas
 # MAGIC %pip install nltk 
 # MAGIC %pip install gensim
 # MAGIC %pip install semantic-text-similarity
-# MAGIC %pip install torch
 # MAGIC %pip install numpy 
 # MAGIC %pip install matplotlib 
 # MAGIC
+
+# COMMAND ----------
+
+# Import Functions 
 
 # COMMAND ----------
 
@@ -28,8 +35,21 @@ from sklearn.decomposition import PCA
 
 # COMMAND ----------
 
-df1 = pd.read_csv('EIRF_YEAR.csv', usecols = ['Description', 'Location'], encoding = 'latin1')
-df2 = pd.read_csv('WAASB.csv', usecols = ['DESCRIPTION', 'LOCATION'], encoding = 'latin1')
+# Read in files 
+
+# COMMAND ----------
+
+df1 = pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Data/EIRF_YEAR.csv', encoding = 'latin1')
+df2 = pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Data/WAASB.csv',encoding = 'latin1')
+
+# COMMAND ----------
+
+# Assuming your DataFrame is similar_reports_df
+df2 = df2.rename(columns={'LOCATION': 'Location'})
+
+# COMMAND ----------
+
+df2['Location'] = df2['Location'].str.title() # Useful as this station names are written each word is capatalised 
 
 # COMMAND ----------
 
@@ -41,8 +61,16 @@ print(f"The percentage of non-null values in the column is: {percentage_non_null
 
 # COMMAND ----------
 
+# Load in the model and tokenizer
+
+# COMMAND ----------
+
 tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased')
 model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
+
+# COMMAND ----------
+
+# Text Preprocessing 
 
 # COMMAND ----------
 
@@ -77,10 +105,18 @@ sentences_from_file2 = [clean_text(sentence) for sentence in df2['DESCRIPTION'].
 
 # COMMAND ----------
 
+# Embed the tokens 
+
+# COMMAND ----------
+
 # Encode sentences to obtain embeddings
 embeddings1 = model.encode(sentences_from_file1, convert_to_tensor=True)
 embeddings2 = model.encode(sentences_from_file2, convert_to_tensor=True)
 
+
+# COMMAND ----------
+
+# Determine the cosine similarity 
 
 # COMMAND ----------
 
@@ -90,23 +126,35 @@ embeddings2 = model.encode(sentences_from_file2, convert_to_tensor=True)
 similarity_matrix = cosine_similarity(embeddings1, embeddings2)
 
 # Set similarity threshold
-threshold = 0.85
-# Find indices of similar reports above the threshold
-similar_reports_indices = [(i, j) for i in range(len(sentences_from_file1)) for j in range(len(sentences_from_file2)) if similarity_matrix[i, j] > threshold]
+threshold = 0.75
 
 # Create DataFrame to store similar reports
 similar_reports_list = []
-for i, j in similar_reports_indices:
-    similar_reports_list.append({
-        'File1_Index': i,
-        'File2_Index': j,
-        'File1_Description': sentences_from_file1[i],
-        'File2_Description': sentences_from_file2[j],
-        'Similarity_Score': similarity_matrix[i, j]
-    })
+
+for i, row1 in df1.iterrows():
+    for j, row2 in df2.iterrows():
+        similarity_score = similarity_matrix[i, j]
+        
+        # Check if similarity score is above threshold and locations are the same
+        if similarity_score > threshold and row1['Location'] == row2['Location']:
+            similar_reports_list.append({
+                'File1_Index': i,
+                'File2_Index': j,
+                'File1_Description': sentences_from_file1[i],
+                'File2_Description': sentences_from_file2[j],
+                'Similarity_Score': similarity_score,
+                'EIRF_Location': row1['Location'],
+                'EIRF_Date': row1['Date'],
+                'WAASB_Location': row2['Location'],
+                'WAASB_Date': row2['Date'],
+            })
 
 # Create a DataFrame for similar reports
 similar_reports_df = pd.DataFrame(similar_reports_list)
+
+# Save the DataFrame to a CSV file
+similar_reports_df.to_csv('similar_reports_output.csv', index=False)
+
 
 
 
@@ -114,6 +162,10 @@ similar_reports_df = pd.DataFrame(similar_reports_list)
 
 display(similar_reports_df)
 
+
+# COMMAND ----------
+
+# Save the output file
 
 # COMMAND ----------
 

@@ -186,4 +186,18 @@ similar_reports_df = similar_reports_df[['Row_Num', 'Row_Num_Duplicate', 'Descri
 
 # COMMAND ----------
 
+
+
+# Assuming you have a dataframe named 'df' and a column named 'description'
+# Replace 'your_description' with the actual description you want to remove
+description_to_remove = '[ blank ]'
+
+# Filter rows based on the condition
+similar_reports_df = similar_reports_df[similar_reports_df['Description'] != description_to_remove]
+
+similar_reports_df.drop(similar_reports_df[similar_reports_df['Description'] == description_to_remove].index, inplace=True)
+
+
+# COMMAND ----------
+
 display(similar_reports_df)
