@@ -137,7 +137,7 @@ df1 = df1.reset_index(drop=True)
 similarity_matrix = cosine_similarity(embeddings1)
 
 # Set similarity threshold
-threshold = 0.70
+threshold = 0.77
 
 # Find indices of similar reports above the threshold with the same location
 similar_reports_indices = [

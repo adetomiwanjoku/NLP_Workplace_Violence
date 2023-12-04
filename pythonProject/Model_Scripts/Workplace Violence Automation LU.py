@@ -44,6 +44,10 @@ df2 = pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Viol
 
 # COMMAND ----------
 
+df1.head()
+
+# COMMAND ----------
+
 # Assuming your DataFrame is similar_reports_df
 df2 = df2.rename(columns={'LOCATION': 'Location'})
 
