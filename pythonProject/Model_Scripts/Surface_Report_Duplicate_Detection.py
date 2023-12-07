@@ -9,7 +9,6 @@
 # MAGIC %pip install nltk 
 # MAGIC %pip install gensim
 # MAGIC %pip install semantic-text-similarity
-# MAGIC %pip install torch4
 # MAGIC %pip install numpy 
 # MAGIC %pip install matplotlib 
 # MAGIC %pip install keplergl==0.2.2 
@@ -52,11 +51,7 @@ df1 = pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Viol
 
 # COMMAND ----------
 
-df1.shape
-
-# COMMAND ----------
-
-df1.value_counts('Location')
+df1 = df1.rename(columns={'Location / Road Name': 'Location'})
 
 # COMMAND ----------
 
@@ -77,23 +72,11 @@ print(f"The percentage of non-null values in the column is: {percentage_non_null
 # COMMAND ----------
 
 # Assuming your DataFrame is similar_reports_df
-df1 = df1.rename(columns={'Bus Route ': 'Bus_Route'})
-
-# COMMAND ----------
-
-df1.columns
-
-# COMMAND ----------
-
-df1 = df1.rename(columns={'Location / Road Name': 'Location'})
+df1 = df1.rename(columns={'Bus Route ': 'Bus_Route','Incident Date': 'Incident_Date'})
 
 # COMMAND ----------
 
 df1['Location'] = df1['Location'].str.title() # Useful as this station names are written each word is capatalised
-
-# COMMAND ----------
-
-display(df1)
 
 # COMMAND ----------
 
@@ -144,7 +127,8 @@ sentences_from_file1 = [clean_text(sentence) for sentence in df1['Description'].
 
 # COMMAND ----------
 
-# Embed the words 
+# MAGIC %md
+# MAGIC # Embed the words 
 
 # COMMAND ----------
 
@@ -169,14 +153,15 @@ similarity_matrix = cosine_similarity(embeddings1)
 # Set similarity threshold
 threshold = 0.70
 
-# Find indices of similar reports above the threshold with the same location or Bus Route
+# Find indices of similar reports above the threshold with the same location, Bus Route, and Date
 similar_reports_indices = [
     (i, j)
     for i in range(len(sentences_from_file1))
     for j in range(i + 1, len(sentences_from_file1))
     if (
         (similarity_matrix[i, j] > threshold) and
-        ((df1['Bus Route'][i] == df1['Bus Route'][j]) or (df1['Location'][i] == df1['Location'][j]))
+        ((df1['Bus Route'][i] == df1['Bus Route'][j]) or (df1['Location'][i] == df1['Location'][j])) and
+        (df1['Incident_Date'][i] == df1['Incident_Date'][j])
     )
 ]
 
@@ -190,6 +175,7 @@ similar_reports_df = pd.DataFrame([
         'Similarity_Score': similarity_matrix[i, j],
         'Location': df1['Location'][i],
         'Bus_Route': df1['Bus Route'][i],
+        'Date': df1['Incident_Date'][i],  # Include the Date column in the output DataFrame
     }
     for i, j in similar_reports_indices
 ])
@@ -200,6 +186,7 @@ similar_reports_df['Row_Num_Duplicate'] = similar_reports_df['File2_Index'] + 2
 
 # Display the final DataFrame
 print(similar_reports_df)
+
 
 
 
@@ -225,7 +212,7 @@ similar_reports_df['Is_Duplicate'] = ''
 # COMMAND ----------
 
 # Reorder columns with the new index as the first column
-similar_reports_df = similar_reports_df[['Row_Num', 'Row_Num_Duplicate', 'Description', 'Duplicate','Similarity_Score_Percent', 'Is_Duplicate', 'Location', 'Bus_Route']]
+similar_reports_df = similar_reports_df[['Row_Num', 'Row_Num_Duplicate', 'Description', 'Duplicate','Similarity_Score_Percent', 'Location', 'Bus_Route', 'Is_Duplicate']]
 
 # COMMAND ----------
 
