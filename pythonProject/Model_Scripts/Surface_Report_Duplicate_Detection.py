@@ -48,7 +48,7 @@ import h3
 # COMMAND ----------
 
 #df1 = pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Data/three_day_copy_surface_reports.csv', encoding = 'latin1')
-df1 =  pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Duplicate_Dataset_Surface.csv', encoding = 'latin1')
+df1 =  pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Data/Duplication_Dataset_Surface', encoding = 'latin1')
 
 # COMMAND ----------
 
