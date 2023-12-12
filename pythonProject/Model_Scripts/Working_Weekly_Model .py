@@ -51,7 +51,7 @@ display(df1)
 # COMMAND ----------
 
 # Assuming your DataFrame is similar_reports_df
-df1 = df1.rename(columns={'ï»¿Data Ref Num': 'Reference_Number'})
+df1 = df1.rename(columns={'ï»¿Data Ref Num': 'Reference_Number', 'Incident Updated Date' : 'Incident_Date'})
 
 
 # COMMAND ----------
@@ -137,14 +137,14 @@ df1 = df1.reset_index(drop=True)
 similarity_matrix = cosine_similarity(embeddings1)
 
 # Set similarity threshold
-threshold = 0.77
+threshold = 0.75
 
 # Find indices of similar reports above the threshold with the same location
 similar_reports_indices = [
     (i, j)
     for i in range(len(sentences_from_file1))
     for j in range(i + 1, len(sentences_from_file1))
-    if (similarity_matrix[i, j] > threshold) and (df1['LOCATION'].iloc[i] == df1['LOCATION'].iloc[j])
+    if (similarity_matrix[i, j] > threshold) and (df1['LOCATION'].iloc[i] == df1['LOCATION'].iloc[j]) and (df1['Incident_Date'][i] == df1['Incident_Date'][j])
 ]
 
 # Create a DataFrame for similar reports
@@ -204,6 +204,15 @@ similar_reports_df['Similarity_Score_Percent'] = (similar_reports_df['Similarity
 
 # Reorder columns with the new index as the first column
 similar_reports_df = similar_reports_df[['Row_Num', 'Row_Num_Duplicate', 'Description', 'Duplicate', 'Duplicate_Reference_Number', 'Location', 'Similarity_Score_Percent', 'Is_Duplicate']]
+
+# COMMAND ----------
+
+description_to_remove = 'nan'
+
+# Filter rows based on the condition
+similar_reports_df = similar_reports_df[similar_reports_df['Description'] != description_to_remove]
+
+similar_reports_df.drop(similar_reports_df[similar_reports_df['Description'] == description_to_remove].index, inplace=True)
 
 # COMMAND ----------
 

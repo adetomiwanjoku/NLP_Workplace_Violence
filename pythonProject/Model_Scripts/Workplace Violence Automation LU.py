@@ -14,7 +14,8 @@
 
 # COMMAND ----------
 
-# Import Functions 
+# MAGIC %md
+# MAGIC # Import Functions 
 
 # COMMAND ----------
 
@@ -35,7 +36,8 @@ from sklearn.decomposition import PCA
 
 # COMMAND ----------
 
-# Read in files 
+# MAGIC %md
+# MAGIC # Read in files 
 
 # COMMAND ----------
 
@@ -109,7 +111,8 @@ sentences_from_file2 = [clean_text(sentence) for sentence in df2['DESCRIPTION'].
 
 # COMMAND ----------
 
-# Embed the tokens 
+# MAGIC %md
+# MAGIC # Embed the tokens 
 
 # COMMAND ----------
 
