@@ -86,7 +86,7 @@ df1['Location'] = df1['Location'].str.title() # Useful as this station names are
 
 # COMMAND ----------
 
-tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased')
+#tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased')
 model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
 
 # COMMAND ----------
@@ -152,7 +152,7 @@ df1 = df1.reset_index(drop=True)
 similarity_matrix = cosine_similarity(embeddings1)
 
 # Set similarity threshold
-threshold = 0.70
+threshold = 0.75
 
 # Find indices of similar reports above the threshold with the same location, Bus Route, and Date
 similar_reports_indices = [

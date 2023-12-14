@@ -137,14 +137,14 @@ df1 = df1.reset_index(drop=True)
 similarity_matrix = cosine_similarity(embeddings1)
 
 # Set similarity threshold
-threshold = 0.75
+threshold = 0.80
 
 # Find indices of similar reports above the threshold with the same location
 similar_reports_indices = [
     (i, j)
     for i in range(len(sentences_from_file1))
     for j in range(i + 1, len(sentences_from_file1))
-    if (similarity_matrix[i, j] > threshold) and (df1['LOCATION'].iloc[i] == df1['LOCATION'].iloc[j]) and (df1['Incident_Date'][i] == df1['Incident_Date'][j])
+    if (similarity_matrix[i, j] >= threshold) and (df1['LOCATION'].iloc[i] == df1['LOCATION'].iloc[j]) and (df1['Date'][i] == df1['Date'][j])
 ]
 
 # Create a DataFrame for similar reports
@@ -155,7 +155,8 @@ similar_reports_df = pd.DataFrame([
         'Description': sentences_from_file1[i],
         'Duplicate': sentences_from_file1[j],
         'Similarity_Score': similarity_matrix[i, j],
-        'Location': df1['LOCATION'].iloc[i]
+        'Location': df1['LOCATION'].iloc[i],
+        'Date' : df1['Date'].iloc[i]
     }
     for i, j in similar_reports_indices
 ])
@@ -203,7 +204,7 @@ similar_reports_df['Similarity_Score_Percent'] = (similar_reports_df['Similarity
 # COMMAND ----------
 
 # Reorder columns with the new index as the first column
-similar_reports_df = similar_reports_df[['Row_Num', 'Row_Num_Duplicate', 'Description', 'Duplicate', 'Duplicate_Reference_Number', 'Location', 'Similarity_Score_Percent', 'Is_Duplicate']]
+similar_reports_df = similar_reports_df[['Date','Row_Num', 'Row_Num_Duplicate', 'Description', 'Duplicate', 'Duplicate_Reference_Number', 'Location', 'Similarity_Score_Percent', 'Is_Duplicate']]
 
 # COMMAND ----------
 
