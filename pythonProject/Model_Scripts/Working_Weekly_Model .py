@@ -42,7 +42,9 @@ from sklearn.decomposition import PCA
 
 # COMMAND ----------
 
-df1 = pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Data/Week_Data.csv', encoding = 'latin1')
+#df1 = pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Data/Week_Data.csv', encoding = 'latin1')
+#df1 = pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Data/Copy_WVA_Incidents.csv', encoding = 'latin1')
+df1 = pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Data/WVA_Incidents.csv', encoding= 'latin')
 
 # COMMAND ----------
 
@@ -61,7 +63,7 @@ df1 = df1.rename(columns={'ï»¿Data Ref Num': 'Reference_Number', 'Incident Up
 
 # COMMAND ----------
 
-tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased')
+#tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased')
 model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
 
 # COMMAND ----------
@@ -137,14 +139,14 @@ df1 = df1.reset_index(drop=True)
 similarity_matrix = cosine_similarity(embeddings1)
 
 # Set similarity threshold
-threshold = 0.80
+threshold = 0.70
 
 # Find indices of similar reports above the threshold with the same location
 similar_reports_indices = [
     (i, j)
     for i in range(len(sentences_from_file1))
     for j in range(i + 1, len(sentences_from_file1))
-    if (similarity_matrix[i, j] >= threshold) and (df1['LOCATION'].iloc[i] == df1['LOCATION'].iloc[j]) and (df1['Date'][i] == df1['Date'][j])
+    if (similarity_matrix[i, j] >= threshold) and (df1['LOCATION'].iloc[i] == df1['LOCATION'].iloc[j])
 ]
 
 # Create a DataFrame for similar reports
@@ -156,7 +158,6 @@ similar_reports_df = pd.DataFrame([
         'Duplicate': sentences_from_file1[j],
         'Similarity_Score': similarity_matrix[i, j],
         'Location': df1['LOCATION'].iloc[i],
-        'Date' : df1['Date'].iloc[i]
     }
     for i, j in similar_reports_indices
 ])
@@ -204,7 +205,7 @@ similar_reports_df['Similarity_Score_Percent'] = (similar_reports_df['Similarity
 # COMMAND ----------
 
 # Reorder columns with the new index as the first column
-similar_reports_df = similar_reports_df[['Date','Row_Num', 'Row_Num_Duplicate', 'Description', 'Duplicate', 'Duplicate_Reference_Number', 'Location', 'Similarity_Score_Percent', 'Is_Duplicate']]
+similar_reports_df = similar_reports_df[['Row_Num', 'Row_Num_Duplicate', 'Description', 'Duplicate', 'Duplicate_Reference_Number', 'Location', 'Similarity_Score_Percent', 'Is_Duplicate']]
 
 # COMMAND ----------
 
