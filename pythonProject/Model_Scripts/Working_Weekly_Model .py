@@ -43,8 +43,8 @@ from sklearn.decomposition import PCA
 # COMMAND ----------
 
 #df1 = pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Data/Week_Data.csv', encoding = 'latin1')
-#df1 = pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Data/Copy_WVA_Incidents.csv', encoding = 'latin1')
-df1 = pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Data/WVA_Incidents.csv', encoding= 'latin')
+df1 = pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Data/Copy_WVA_Incidents.csv', encoding = 'latin1')
+#df1 = pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Data/WVA_Incidents.csv', encoding= 'latin')
 
 # COMMAND ----------
 

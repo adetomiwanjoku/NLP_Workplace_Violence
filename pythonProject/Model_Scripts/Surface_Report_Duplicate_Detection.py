@@ -52,6 +52,10 @@ df1 =  pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Vio
 
 # COMMAND ----------
 
+df1.head()
+
+# COMMAND ----------
+
 df1 = df1.rename(columns={'Location / Road Name': 'Location'})
 
 # COMMAND ----------
