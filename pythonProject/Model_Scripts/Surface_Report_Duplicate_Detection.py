@@ -156,7 +156,7 @@ df1 = df1.reset_index(drop=True)
 similarity_matrix = cosine_similarity(embeddings1)
 
 # Set similarity threshold
-threshold = 0.50
+threshold = 0.55
 
 # Find indices of similar reports above the threshold with the same location, Bus Route, and Date
 similar_reports_indices = [
@@ -166,9 +166,13 @@ similar_reports_indices = [
     if (
         (similarity_matrix[i, j] > threshold) and
         ((df1['Bus Route'][i] == df1['Bus Route'][j]) or (df1['Location'][i] == df1['Location'][j])) and
-        (df1['Incident_Date'][i] == df1['Incident_Date'][j]) and (df1['URN'][i] != df1['URN'][j])
+        (df1['Incident_Date'][i] == df1['Incident_Date'][j]) and 
+        (df1['URN'][i] != df1['URN'][j]) and
+        ((df1['DIR'][i] == 'DIR' and df1['IRIS'][j] == 'IRIS') or
+         (df1['IRIS'][i] == 'IRIS' and df1['DIR'][j] == 'DIR'))
     )
 ]
+
 
 # Create a DataFrame for similar reports with Bus_Route column
 similar_reports_df = pd.DataFrame([

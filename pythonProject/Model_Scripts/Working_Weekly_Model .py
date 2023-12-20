@@ -58,6 +58,10 @@ df1 = df1.rename(columns={'ï»¿Data Ref Num': 'Reference_Number', 'Incident Up
 
 # COMMAND ----------
 
+df1.head()
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC # Define the model and the tokenizer 
 
@@ -146,7 +150,7 @@ similar_reports_indices = [
     (i, j)
     for i in range(len(sentences_from_file1))
     for j in range(i + 1, len(sentences_from_file1))
-    if (similarity_matrix[i, j] >= threshold) and (df1['LOCATION'].iloc[i] == df1['LOCATION'].iloc[j])
+    if (similarity_matrix[i, j] >= threshold) and (df1['LOCATION'].iloc[i] == df1['LOCATION'].iloc[j]) and (df1['Reference_Number'][i] != df1['Reference_Number'][j])
 ]
 
 # Create a DataFrame for similar reports
