@@ -12,9 +12,6 @@
 # MAGIC %pip install numpy 
 # MAGIC %pip install matplotlib 
 # MAGIC %pip install keplergl==0.2.2 
-# MAGIC %pip install h3
-# MAGIC %pip install h3pandas
-# MAGIC %pip install geopandas
 
 # COMMAND ----------
 
@@ -34,11 +31,7 @@ from nltk.tokenize import word_tokenize
 import torch
 import os 
 import numpy
-import matplotlib.pyplot as plt
-from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
-from keplergl import KeplerGl 
-import h3 
+from utils.py import * 
 
 # COMMAND ----------
 
