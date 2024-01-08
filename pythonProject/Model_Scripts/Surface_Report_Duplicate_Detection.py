@@ -12,6 +12,7 @@
 # MAGIC %pip install numpy 
 # MAGIC %pip install matplotlib 
 # MAGIC %pip install keplergl==0.2.2 
+# MAGIC
 
 # COMMAND ----------
 
@@ -31,7 +32,7 @@ from nltk.tokenize import word_tokenize
 import torch
 import os 
 import numpy
-from utils.py import * 
+from utils import * 
 
 # COMMAND ----------
 
