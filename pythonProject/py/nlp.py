@@ -1,10 +1,8 @@
-
+!pip install nltk
 import pandas as pd
+import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
-
-# Download NLTK resources
-import nltk
 nltk.download('stopwords')
 nltk.download('punkt')
 

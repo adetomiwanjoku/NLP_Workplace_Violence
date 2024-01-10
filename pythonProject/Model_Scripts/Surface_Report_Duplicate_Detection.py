@@ -51,10 +51,6 @@ df1 =  pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Vio
 
 # COMMAND ----------
 
-df1.head()
-
-# COMMAND ----------
-
 df1 = df1.rename(columns={'Location / Road Name': 'Location'})
 
 # COMMAND ----------
@@ -99,6 +95,14 @@ model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
 
 # COMMAND ----------
 
+clean_text = clean_text('Description')
+
+# COMMAND ----------
+
+clean_text = create_preprocessing_pipeline(df1, 'Description')
+
+# COMMAND ----------
+
 # Load NLTK stopwords
 nltk.download('stopwords')
 nltk.download('punkt')
@@ -128,6 +132,10 @@ def clean_text(text):
 
 # Clean and preprocess sentences
 sentences_from_file1 = [clean_text(sentence) for sentence in df1['Description'].astype(str).tolist()]
+
+# COMMAND ----------
+
+display(clean_text)
 
 # COMMAND ----------
 
