@@ -21,6 +21,10 @@
 
 # COMMAND ----------
 
+dbutils.library.restartPython()
+
+# COMMAND ----------
+
 import pandas as pd
 from sentence_transformers import SentenceTransformer, util
 from transformers import BertTokenizer
@@ -32,7 +36,8 @@ from nltk.tokenize import word_tokenize
 import torch
 import os 
 import numpy
-from utils import * 
+from py.nlp import *
+
 
 # COMMAND ----------
 
