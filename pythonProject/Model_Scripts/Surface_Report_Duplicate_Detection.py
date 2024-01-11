@@ -95,47 +95,11 @@ model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
 
 # COMMAND ----------
 
-clean_text = clean_text('Description')
-
-# COMMAND ----------
-
-clean_text = create_preprocessing_pipeline(df1, 'Description')
-
-# COMMAND ----------
-
-# Load NLTK stopwords
-nltk.download('stopwords')
-nltk.download('punkt')
-stop_words = set(stopwords.words('english'))
-custom_stop_words = {'male', 'female'}
-
-# Combine standard English stopwords and custom stopwords
-stop_words.update(custom_stop_words)
-
-# COMMAND ----------
-
-def clean_text(text):
-    # Handle NaN values by replacing them with an empty string
-    text = str(text) if not pd.isnull(text) else ''
-    # Lowercase the text
-    text = text.lower()
-    # Tokenize the text
-    tokens = word_tokenize(text)
-    # Remove stopwords and custom words
-    filtered_tokens = [word for word in tokens if word not in stop_words]
-    # Join tokens back into a cleaned text
-    cleaned_text = ' '.join(filtered_tokens)
-    return cleaned_text
-
-# COMMAND ----------
-
-
-# Clean and preprocess sentences
-sentences_from_file1 = [clean_text(sentence) for sentence in df1['Description'].astype(str).tolist()]
-
-# COMMAND ----------
-
-display(clean_text)
+# Example usage:
+# Assuming df1 is your DataFrame and stop_words is a list of stopwords
+stop_words = set(stopwords.words('english'))  # or use your custom stop_words list
+df1['Cleaned_Description'] = df1['Description'].apply(lambda x: clean_text(x, stop_words))
+sentences_from_file1 = df1['Cleaned_Description'].astype(str).tolist()
 
 # COMMAND ----------
 
