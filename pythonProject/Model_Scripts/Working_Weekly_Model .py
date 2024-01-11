@@ -197,12 +197,13 @@ similar_reports_df = similar_reports_df.drop(['File1_Index', 'File2_Index'], axi
 
 # COMMAND ----------
 
-
 # Add a column called 'Duplicate_Reference_Number'
 similar_reports_df['Duplicate_Reference_Number'] = similar_reports_df['Row_Num_Duplicate'].apply(
+    # For each file2_index, get the 'Reference_Number' from df1 at index (file2_index - 2)
     lambda file2_index: df1.iloc[file2_index - 2]['Reference_Number']
 )
-# Add an empty column called 'is_duplicate'
+
+# Add an empty column called 'Is_Duplicate'
 similar_reports_df['Is_Duplicate'] = ''
 
 
