@@ -35,12 +35,10 @@ import numpy
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC # Read in week's worth of workplace violence reports 
+# MAGIC # Read in data
 
 # COMMAND ----------
 
-#df1 = pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Data/Week_Data.csv', encoding = 'latin1')
-#df1 = pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Data/Copy_WVA_Incidents.csv', encoding = 'latin1')
 df1 = pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Data/WVA_Incidents.csv', encoding= 'latin')
 
 # COMMAND ----------
@@ -60,11 +58,10 @@ df1.head()
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC # Define the model and the tokenizer 
+# MAGIC # Define the model  
 
 # COMMAND ----------
 
-#tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased')
 model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
 
 # COMMAND ----------
@@ -107,10 +104,6 @@ sentences_from_file1 = [clean_text(sentence) for sentence in df1['DESCRIPTION'].
 
 # COMMAND ----------
 
-sentences_from_file1 # look into this 
-
-# COMMAND ----------
-
 # MAGIC %md
 # MAGIC # Embeds the tokens 
 
@@ -122,16 +115,13 @@ embeddings1 = model.encode(sentences_from_file1, convert_to_tensor=True)
 
 # COMMAND ----------
 
-embeddings1 # looj 
+embeddings1 
 
 # COMMAND ----------
 
-# MAGIC %md
-# MAGIC # Identify duplicates using threshold with cosine similarity 
+# Define cosine similarity threshold 
 
 # COMMAND ----------
-
-
 
 # Reset the index of df1
 df1 = df1.reset_index(drop=True)
@@ -142,7 +132,15 @@ similarity_matrix = cosine_similarity(embeddings1)
 # Set similarity threshold
 threshold = 0.55
 
-# Find indices of similar reports above the threshold with the same location
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC # Model Logic to Identify Semantic Duplicates 
+
+# COMMAND ----------
+
+
+# Find indices of similar reports above the threshold with the same location, same incident date and different reference number
 similar_reports_indices = [
     (i, j)
     for i in range(len(sentences_from_file1))
@@ -154,6 +152,15 @@ similar_reports_indices = [
         (df1['Reference_Number'][i] != df1['Reference_Number'][j])
     )
 ]
+
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC # Creation of the dataframe 
+
+# COMMAND ----------
+
 
 # Create a DataFrame for similar reports
 similar_reports_df = pd.DataFrame([
@@ -168,7 +175,7 @@ similar_reports_df = pd.DataFrame([
     for i, j in similar_reports_indices
 ])
 
-# Add new index columns for each file index that adds two to the existing index
+# Add new index columns for each file index that adds two to the existing index 
 similar_reports_df['Row_Num'] = similar_reports_df['File1_Index'] + 2
 similar_reports_df['Row_Num_Duplicate'] = similar_reports_df['File2_Index'] + 2
 
@@ -180,7 +187,7 @@ similar_reports_df['Row_Num_Duplicate'] = similar_reports_df['File2_Index'] + 2
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC # Create Output File 
+# MAGIC # Determine the columns of the output file 
 
 # COMMAND ----------
 
@@ -201,10 +208,6 @@ similar_reports_df['Is_Duplicate'] = ''
 
 # COMMAND ----------
 
-similar_reports_df.columns
-
-# COMMAND ----------
-
 similar_reports_df['Similarity_Score_Percent'] = (similar_reports_df['Similarity_Score'] * 100).round()
 
 
@@ -212,15 +215,6 @@ similar_reports_df['Similarity_Score_Percent'] = (similar_reports_df['Similarity
 
 # Reorder columns with the new index as the first column
 similar_reports_df = similar_reports_df[['Row_Num', 'Row_Num_Duplicate', 'Description', 'Duplicate','Location', 'Similarity_Score_Percent', 'Is_Duplicate']]
-
-# COMMAND ----------
-
-description_to_remove = 'nan'
-
-# Filter rows based on the condition
-similar_reports_df = similar_reports_df[similar_reports_df['Description'] != description_to_remove]
-
-similar_reports_df.drop(similar_reports_df[similar_reports_df['Description'] == description_to_remove].index, inplace=True)
 
 # COMMAND ----------
 

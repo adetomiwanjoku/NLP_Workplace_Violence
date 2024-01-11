@@ -48,23 +48,12 @@ df1 =  pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Vio
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC # Data Renaming 
+
+# COMMAND ----------
+
 df1 = df1.rename(columns={'Location / Road Name': 'Location'})
-
-# COMMAND ----------
-
-
-# Calculate the percentage of non-null values in the column in one step
-percentage_non_null = (df1['Location'].count() / len(df1['Location'])) * 100
-
-print(f"The percentage of non-null values in the column is: {percentage_non_null:.2f}%")
-
-# COMMAND ----------
-
-
-# Calculate the percentage of non-null values in the column in one step
-percentage_non_null = (df1['Bus Route'].count() / len(df1['Bus Route'])) * 100
-
-print(f"The percentage of non-null values in the column is: {percentage_non_null:.2f}%")
 
 # COMMAND ----------
 
@@ -74,14 +63,6 @@ df1 = df1.rename(columns={'Bus Route ': 'Bus_Route','Incident Date': 'Incident_D
 # COMMAND ----------
 
 df1['Location'] = df1['Location'].str.title() # Useful as this station names are written each word is capatalised
-
-# COMMAND ----------
-
-df1.shape
-
-# COMMAND ----------
-
-df1.head()
 
 # COMMAND ----------
 
@@ -148,9 +129,6 @@ embeddings1 = model.encode(sentences_from_file1, convert_to_tensor=True)
 # COMMAND ----------
 
 
-# Assuming you have the necessary imports and data loaded before this code snippet
-import datetime
-
 # Reset the index of df1
 df1 = df1.reset_index(drop=True)
 
@@ -158,6 +136,14 @@ similarity_matrix = cosine_similarity(embeddings1)
 
 # Set similarity threshold
 threshold = 0.55
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC # Model Logic to Identify Semantic Duplicates 
+
+# COMMAND ----------
+
 
 time_window_duration = timedelta(minutes=90)
 
@@ -179,6 +165,16 @@ similar_reports_indices = [
     ]
 
 
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC # Creation of the dataframe 
+
+# COMMAND ----------
+
+
+
+
 # Create a DataFrame for similar reports with Bus_Route column
 similar_reports_df = pd.DataFrame([
     {
@@ -196,8 +192,7 @@ similar_reports_df = pd.DataFrame([
     for i, j in similar_reports_indices
 ])
 
-# Print the resulting DataFrame
-print(similar_reports_df)
+
 
 
 # Add new index columns for each file index that adds two to the existing index
@@ -224,26 +219,12 @@ similar_reports_df['Is_Duplicate'] = ''
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC # Create a data frame output 
+# MAGIC # Define the columns of the Dataframe 
 
 # COMMAND ----------
 
 # Reorder columns with the new index as the first column
 similar_reports_df = similar_reports_df[['Incident_Time','Incident_Time_Duplicate' ,'Row_Num', 'Row_Num_Duplicate','Incident', 'Incident_Duplicate','Similarity_Score_Percent', 'Location', 'Bus_Route', 'Is_Duplicate']]
-
-# COMMAND ----------
-
-
-
-# Assuming you have a dataframe named 'df' and a column named 'description'
-# Replace 'your_description' with the actual description you want to remove
-description_to_remove = '[ blank ]'
-
-# Filter rows based on the condition
-similar_reports_df = similar_reports_df[similar_reports_df['Description'] != description_to_remove]
-
-similar_reports_df.drop(similar_reports_df[similar_reports_df['Description'] == description_to_remove].index, inplace=True)
-
 
 # COMMAND ----------
 
