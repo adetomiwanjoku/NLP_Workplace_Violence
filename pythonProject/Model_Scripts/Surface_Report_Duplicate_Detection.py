@@ -81,6 +81,10 @@ df1.shape
 
 # COMMAND ----------
 
+df1.head()
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC # Load model and tokenizer
 
@@ -180,14 +184,14 @@ similar_reports_df = pd.DataFrame([
     {
         'File1_Index': i,
         'File2_Index': j,
-        'Description': sentences_from_file1[i],
-        'Duplicate': sentences_from_file1[j],
+        'Incident': sentences_from_file1[i],
+        'Incident_Duplicate': sentences_from_file1[j],
         'Similarity_Score': similarity_matrix[i, j],
         'Location': df1['Location'][i],
         'Bus_Route': df1['Bus Route'][i],
         'Date': df1['Incident_Date'][i],
-        'Incident_Time_1': df1['Time'][i],  # Include the Time column in the output DataFrame
-        'Incident_Time_2' : df1['Time'][j]
+        'Incident_Time': df1['Time'][i],  # Include the Time column in the output DataFrame
+        'Incident_Time_Duplicate' : df1['Time'][j]
     }
     for i, j in similar_reports_indices
 ])
@@ -225,7 +229,7 @@ similar_reports_df['Is_Duplicate'] = ''
 # COMMAND ----------
 
 # Reorder columns with the new index as the first column
-similar_reports_df = similar_reports_df[['Row_Num', 'Row_Num_Duplicate', 'Description', 'Duplicate','Similarity_Score_Percent', 'Location', 'Bus_Route', 'Is_Duplicate']]
+similar_reports_df = similar_reports_df[['Incident_Time','Incident_Time_Duplicate' ,'Row_Num', 'Row_Num_Duplicate','Incident', 'Incident_Duplicate','Similarity_Score_Percent', 'Location', 'Bus_Route', 'Is_Duplicate']]
 
 # COMMAND ----------
 
@@ -244,3 +248,4 @@ similar_reports_df.drop(similar_reports_df[similar_reports_df['Description'] == 
 # COMMAND ----------
 
 display(similar_reports_df)
+
