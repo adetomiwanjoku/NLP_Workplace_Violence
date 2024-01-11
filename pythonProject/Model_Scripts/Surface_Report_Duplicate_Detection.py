@@ -35,8 +35,7 @@ from nltk.tokenize import word_tokenize
 import torch
 import os 
 import numpy
-from py.nlp import *
-
+from datetime import timedelta
 
 # COMMAND ----------
 
@@ -45,8 +44,7 @@ from py.nlp import *
 
 # COMMAND ----------
 
-#df1 = pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Data/three_day_copy_surface_reports.csv', encoding = 'latin1')
-df1 =  pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Data/Duplication_Dataset_Surface', encoding = 'latin1')
+df1 =  pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Data/April_2023_Jan_2024_Surface_Data.csv', low_memory=False)
 
 # COMMAND ----------
 
@@ -79,6 +77,10 @@ df1['Location'] = df1['Location'].str.title() # Useful as this station names are
 
 # COMMAND ----------
 
+df1.shape
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC # Load model and tokenizer
 
@@ -91,14 +93,6 @@ model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
 
 # MAGIC %md
 # MAGIC # Text Preprocessing 
-
-# COMMAND ----------
-
-clean_text = clean_text('Description')
-
-# COMMAND ----------
-
-clean_text = create_preprocessing_pipeline(df1, 'Description')
 
 # COMMAND ----------
 
@@ -134,10 +128,6 @@ sentences_from_file1 = [clean_text(sentence) for sentence in df1['Description'].
 
 # COMMAND ----------
 
-display(clean_text)
-
-# COMMAND ----------
-
 # MAGIC %md
 # MAGIC # Embed the words 
 
@@ -155,6 +145,7 @@ embeddings1 = model.encode(sentences_from_file1, convert_to_tensor=True)
 
 
 # Assuming you have the necessary imports and data loaded before this code snippet
+import datetime
 
 # Reset the index of df1
 df1 = df1.reset_index(drop=True)
@@ -164,20 +155,24 @@ similarity_matrix = cosine_similarity(embeddings1)
 # Set similarity threshold
 threshold = 0.55
 
-# Find indices of similar reports above the threshold with the same location, Bus Route, and Date
+time_window_duration = timedelta(minutes=90)
+
+
 similar_reports_indices = [
-    (i, j)
-    for i in range(len(sentences_from_file1))
-    for j in range(i + 1, len(sentences_from_file1))
-    if (
-        (similarity_matrix[i, j] > threshold) and
-        ((df1['Bus Route'][i] == df1['Bus Route'][j]) or (df1['Location'][i] == df1['Location'][j])) and
-        (df1['Incident_Date'][i] == df1['Incident_Date'][j]) and 
-        (df1['URN'][i] != df1['URN'][j]) and
-        ((df1['DIR'][i] == 'DIR' and df1['IRIS'][j] == 'IRIS') or
-         (df1['IRIS'][i] == 'IRIS' and df1['DIR'][j] == 'DIR'))
-    )
-]
+        (i, j)
+        for i in range(len(sentences_from_file1))
+        for j in range(i + 1, len(sentences_from_file1))
+        if (
+            (similarity_matrix[i, j] > threshold) and
+            ((df1['Bus Route'][i] == df1['Bus Route'][j]) or (df1['Location'][i] == df1['Location'][j])) and
+            (df1['Incident_Date'][i] == df1['Incident_Date'][j]) and 
+            (df1['URN'][i] != df1['URN'][j]) and
+            ((df1['DIR'][i] == 'DIR' and df1['IRIS'][j] == 'IRIS') or
+             (df1['IRIS'][i] == 'IRIS' and df1['DIR'][j] == 'DIR')) and
+            (abs(pd.to_datetime(str(df1['Incident_Date'][i]) + ' ' + str(df1['Time'][i])) -
+                 pd.to_datetime(str(df1['Incident_Date'][j]) + ' ' + str(df1['Time'][j]))) <= time_window_duration)
+        )
+    ]
 
 
 # Create a DataFrame for similar reports with Bus_Route column
@@ -190,17 +185,20 @@ similar_reports_df = pd.DataFrame([
         'Similarity_Score': similarity_matrix[i, j],
         'Location': df1['Location'][i],
         'Bus_Route': df1['Bus Route'][i],
-        'Date': df1['Incident_Date'][i],  # Include the Date column in the output DataFrame
+        'Date': df1['Incident_Date'][i],
+        'Incident_Time_1': df1['Time'][i],  # Include the Time column in the output DataFrame
+        'Incident_Time_2' : df1['Time'][j]
     }
     for i, j in similar_reports_indices
 ])
 
+# Print the resulting DataFrame
+print(similar_reports_df)
+
+
 # Add new index columns for each file index that adds two to the existing index
 similar_reports_df['Row_Num'] = similar_reports_df['File1_Index'] + 2
 similar_reports_df['Row_Num_Duplicate'] = similar_reports_df['File2_Index'] + 2
-
-# Display the final DataFrame
-print(similar_reports_df)
 
 
 
