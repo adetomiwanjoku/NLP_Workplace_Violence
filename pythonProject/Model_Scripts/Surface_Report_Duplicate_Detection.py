@@ -20,7 +20,15 @@
 
 # COMMAND ----------
 
-dbutils.library.restartPython()
+import os 
+import sys
+
+# COMMAND ----------
+
+path_helper = os.path.join('..','py')
+#path = '/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Model_Scripts/nlp.py'
+sys.path.append(path_helper)
+import nlp 
 
 # COMMAND ----------
 
@@ -78,32 +86,6 @@ model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
 
 # MAGIC %md
 # MAGIC # Text Preprocessing 
-
-# COMMAND ----------
-
-# Load NLTK stopwords
-nltk.download('stopwords')
-nltk.download('punkt')
-stop_words = set(stopwords.words('english'))
-custom_stop_words = {'male', 'female'}
-
-# Combine standard English stopwords and custom stopwords
-stop_words.update(custom_stop_words)
-
-# COMMAND ----------
-
-def clean_text(text):
-    # Handle NaN values by replacing them with an empty string
-    text = str(text) if not pd.isnull(text) else ''
-    # Lowercase the text
-    text = text.lower()
-    # Tokenize the text
-    tokens = word_tokenize(text)
-    # Remove stopwords and custom words
-    filtered_tokens = [word for word in tokens if word not in stop_words]
-    # Join tokens back into a cleaned text
-    cleaned_text = ' '.join(filtered_tokens)
-    return cleaned_text
 
 # COMMAND ----------
 
