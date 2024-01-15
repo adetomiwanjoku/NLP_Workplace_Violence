@@ -1,6 +1,5 @@
 # Databricks notebook source
-# MAGIC %md
-# MAGIC # Install Packages 
+# Install Packag
 
 # COMMAND ----------
 
