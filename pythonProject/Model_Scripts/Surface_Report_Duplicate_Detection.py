@@ -1,5 +1,5 @@
 # Databricks notebook source
-# Install Packag
+# Install Packages
 
 # COMMAND ----------
 
@@ -27,7 +27,7 @@ import sys
 path_helper = os.path.join('..','py')
 #path = '/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Model_Scripts/nlp.py'
 sys.path.append(path_helper)
-import nlp 
+from nlp import *
 
 # COMMAND ----------
 
@@ -88,9 +88,17 @@ model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
 
 # COMMAND ----------
 
+stop_words = set(stopwords.words('english'))
+custom_stop_words = {'male', 'female'}
+
+# Combine standard English stopwords and custom stopwords
+stop_words.update(custom_stop_words)
+
+# COMMAND ----------
+
 
 # Clean and preprocess sentences
-sentences_from_file1 = [clean_text(sentence) for sentence in df1['Description'].astype(str).tolist()]
+sentences_from_file1 = [clean_text(sentence, stop_words=stop_words) for sentence in df1['Description'].astype(str).tolist()]
 
 # COMMAND ----------
 
@@ -153,9 +161,6 @@ similar_reports_indices = [
 
 # COMMAND ----------
 
-
-
-
 # Create a DataFrame for similar reports with Bus_Route column
 similar_reports_df = pd.DataFrame([
     {
@@ -211,3 +216,7 @@ similar_reports_df = similar_reports_df[['Incident_Time','Incident_Time_Duplicat
 
 display(similar_reports_df)
 
+
+# COMMAND ----------
+
+similar_reports_df.to_csv('similar_reports_df', index=False)
