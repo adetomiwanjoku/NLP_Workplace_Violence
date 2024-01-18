@@ -1,5 +1,6 @@
 # Databricks notebook source
-# Install Packages
+# MAGIC %md
+# MAGIC # Install Packages
 
 # COMMAND ----------
 
@@ -60,6 +61,14 @@ df1 =  pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Vio
 
 # COMMAND ----------
 
+df1.head()
+
+# COMMAND ----------
+
+print("Incident ID:", df1['Incident Date']) # example of a dictionary 
+
+# COMMAND ----------
+
 df1 = df1.rename(columns={'Location / Road Name': 'Location'})
 
 # COMMAND ----------
@@ -70,6 +79,10 @@ df1 = df1.rename(columns={'Bus Route ': 'Bus_Route','Incident Date': 'Incident_D
 # COMMAND ----------
 
 df1['Location'] = df1['Location'].str.title() # Useful as this station names are written each word is capatalised
+
+# COMMAND ----------
+
+df1['Location']
 
 # COMMAND ----------
 
@@ -219,4 +232,8 @@ display(similar_reports_df)
 
 # COMMAND ----------
 
-similar_reports_df.to_csv('similar_reports_df', index=False)
+df1.shape
+
+# COMMAND ----------
+
+#similar_reports_df.to_csv('similar_reports_df', index=False)

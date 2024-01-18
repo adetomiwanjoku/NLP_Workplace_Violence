@@ -33,6 +33,7 @@ for num in numbers:
 # COMMAND ----------
 
 # Skip the iteration when a specific condition is met
+numbers = [2, 4, 6, 7, 8, 9]
 for num in numbers:
     if num % 2 == 0:
         print("Even number. Skipping.")
@@ -42,13 +43,8 @@ for num in numbers:
 
 # COMMAND ----------
 
-#  Variable Type 
-
-# COMMAND ----------
-
-grades = [85, 90, 78, 92, 88]
-grades[:-1]
-
+# MAGIC %md
+# MAGIC #  Variable Type 
 
 # COMMAND ----------
 
