@@ -31,6 +31,7 @@ from nltk.tokenize import word_tokenize
 import torch
 import os 
 import numpy
+from datetime import timedelta
 
 # COMMAND ----------
 
@@ -39,7 +40,7 @@ import numpy
 
 # COMMAND ----------
 
-df1 = pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Data/WVA_Incidents.csv', encoding= 'latin')
+df1 = pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Data/London_Underground_Workplace_Violence_Incidents.csv', encoding= 'latin')
 
 # COMMAND ----------
 
@@ -53,7 +54,11 @@ df1 = df1.rename(columns={'ï»¿Data Ref Num': 'Reference_Number', 'Incident Up
 
 # COMMAND ----------
 
-df1.head()
+df1 = df1.dropna(how='all')
+
+# COMMAND ----------
+
+print("Incident ID:", df1['Date']) # example of a dictionary 
 
 # COMMAND ----------
 
@@ -148,10 +153,9 @@ similar_reports_indices = [
     if (
         (similarity_matrix[i, j] > threshold) and
         ((df1['LOCATION'][i] == df1['LOCATION'][j])) and
-        (df1['Incident_Date'][i] == df1['Incident_Date'][j]) and 
-        (df1['Reference_Number'][i] != df1['Reference_Number'][j])
-            (abs(pd.to_datetime(str(df1['Incident_Date'][i]) + ' ' + str(df1['Time'][i])) -
-                 pd.to_datetime(str(df1['Incident_Date'][j]) + ' ' + str(df1['Time'][j]))) <= time_window_duration)
+        (df1['Date'][i] == df1['Date'][j]) and 
+            (abs(pd.to_datetime(str(df1['Date'][i]) + ' ' + str(df1['Time'][i])) -
+                 pd.to_datetime(str(df1['Date'][j]) + ' ' + str(df1['Time'][j]))) <= time_window_duration)
         )
     ]
 
