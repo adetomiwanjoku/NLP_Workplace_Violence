@@ -58,7 +58,12 @@ df1 = df1.dropna(how='all')
 
 # COMMAND ----------
 
-print("Incident ID:", df1['Date']) # example of a dictionary 
+df1['Time'] = pd.to_datetime(df1['Time']).dt.strftime('%H:%M')
+
+
+# COMMAND ----------
+
+print("Incident ID:", df1['Date']) # 14 weeks worth of data 
 
 # COMMAND ----------
 
@@ -144,7 +149,7 @@ threshold = 0.55
 
 # COMMAND ----------
 
-time_window_duration = timedelta(minutes=90)
+time_window_duration = timedelta(minutes=30)
 # Find indices of similar reports above the threshold with the same location, same incident date and different reference number
 similar_reports_indices = [
     (i, j)
@@ -178,6 +183,8 @@ similar_reports_df = pd.DataFrame([
         'Duplicate': sentences_from_file1[j],
         'Similarity_Score': similarity_matrix[i, j],
         'Location': df1['LOCATION'].iloc[i],
+        'Incident_Time': df1['Time'][i],  # Include the Time column in the output DataFrame
+        'Incident_Time_Duplicate' : df1['Time'][j]
     }
     for i, j in similar_reports_indices
 ])
@@ -222,7 +229,7 @@ similar_reports_df['Similarity_Score_Percent'] = (similar_reports_df['Similarity
 # COMMAND ----------
 
 # Reorder columns with the new index as the first column
-similar_reports_df = similar_reports_df[['Row_Num', 'Row_Num_Duplicate', 'Description', 'Duplicate','Location', 'Similarity_Score_Percent', 'Is_Duplicate']]
+similar_reports_df = similar_reports_df[['Row_Num', 'Row_Num_Duplicate','Incident_Time','Incident_Time_Duplicate', 'Description', 'Duplicate','Location', 'Similarity_Score_Percent', 'Is_Duplicate']]
 
 # COMMAND ----------
 
