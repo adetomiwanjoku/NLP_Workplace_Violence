@@ -139,7 +139,7 @@ threshold = 0.55
 
 # COMMAND ----------
 
-
+time_window_duration = timedelta(minutes=90)
 # Find indices of similar reports above the threshold with the same location, same incident date and different reference number
 similar_reports_indices = [
     (i, j)
@@ -150,8 +150,11 @@ similar_reports_indices = [
         ((df1['LOCATION'][i] == df1['LOCATION'][j])) and
         (df1['Incident_Date'][i] == df1['Incident_Date'][j]) and 
         (df1['Reference_Number'][i] != df1['Reference_Number'][j])
-    )
-]
+            (abs(pd.to_datetime(str(df1['Incident_Date'][i]) + ' ' + str(df1['Time'][i])) -
+                 pd.to_datetime(str(df1['Incident_Date'][j]) + ' ' + str(df1['Time'][j]))) <= time_window_duration)
+        )
+    ]
+
 
 
 # COMMAND ----------

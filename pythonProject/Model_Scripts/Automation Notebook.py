@@ -3,59 +3,67 @@
 
 # COMMAND ----------
 
+# Email parameters
+sender_email = "adetomiwanjoku@tfl.gov.uk" 
+receiver_email = "adetomiwanjoku@tfl.gov.uk"
+password = "SouthKorea25.."
+
+# COMMAND ----------
+
 import smtplib
-from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from email.mime.application import MIMEApplication
-import dbutils
+from email.mime.base import MIMEBase
+from email.mime.text import MIMEText
+from email import encoders
 
 # COMMAND ----------
 
+# Attachment parameters
+attachment_path = "/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Model_Scripts/similar_reports_df" 
 
-# Email configuration
-sender_email = "your_email@hotmail.com"  # Update with your Outlook email
-receiver_email = "recipient_email@gmail.com"
-subject = "Databricks Output File"
-body = "This email contains a table with proposed semantic duplicates identified by the model."
-
-# Databricks output file path
-output_file_path = "/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Model_Scripts/similar_reports_df"
-
-
-# COMMAND ----------
-
-
-
-# Retrieve email credentials from Secrets
-smtp_username = dbutils.secrets.get("email-secrets", "outlook-username")
-smtp_password = dbutils.secrets.get("email-secrets", "outlook-password")
-
-# Create the MIME object
-msg = MIMEMultipart()
-msg['From'] = sender_email
-msg['To'] = receiver_email
-msg['Subject'] = subject
-msg.attach(MIMEText(body, 'plain'))
-
-# Attach the Databricks output file
-with open(output_file_path, "rb") as attachment:
-    part = MIMEApplication(attachment.read(), Name="output_file.txt")
-    part['Content-Disposition'] = f'attachment; filename="{output_file_path}"'
-    msg.attach(part)
-
-# SMTP server configuration for Outlook
-smtp_server = "smtp.office365.com"
-smtp_port = 587
-
-
+# Create a multipart message and set headers
+message = MIMEMultipart()
+message["From"] = sender_email
+message["To"] = receiver_email
+message["Subject"] = "CSV Attachment Test"
+# Customize the body message
+body = 'Hello, please find the duplicate reports identified for workplace violence.'
 
 
 # COMMAND ----------
 
-# Connect to the SMTP server and send the email
-with smtplib.SMTP(smtp_server, smtp_port) as server:
+# convert the body to a MIME compatible string
+body = MIMEText(body) 
+# attach it to your main message
+message.attach(body) 
+
+# Open the attachment file in bynary
+with open(attachment_path, "rb") as attachment:
+    # Add file as application/octet-stream
+    part = MIMEBase("application", "octet-stream")
+    part.set_payload((attachment).read())
+
+# Encode file in ASCII characters to send by email    
+encoders.encode_base64(part)
+
+# Add header with pdf name
+part.add_header(
+    "Content-Disposition",
+    f"attachment; filename={attachment_path}",
+)
+
+# Add attachment to message and convert message to string
+message.attach(part)
+text = message.as_string()
+
+# COMMAND ----------
+
+text 
+
+# COMMAND ----------
+
+# Connect to the Outlook SMTP server and send the email
+with smtplib.SMTP("smtp-mail.outlook.com", 587) as server:
     server.starttls()
-    server.login(smtp_username, smtp_password)
-    server.sendmail(sender_email, receiver_email, msg.as_string())
-
-print("Email sent successfully.")
+    server.login(sender_email, password)
+    server.sendmail(sender_email, receiver_email, text)

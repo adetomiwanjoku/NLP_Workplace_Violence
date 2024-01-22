@@ -125,6 +125,14 @@ embeddings1 = model.encode(sentences_from_file1, convert_to_tensor=True)
 
 # COMMAND ----------
 
+print(embeddings1.shape)
+
+# COMMAND ----------
+
+embeddings[0]
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC # Define cosine similarity 
 

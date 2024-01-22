@@ -60,3 +60,23 @@ person1 = Person("Bob", 30)
 person_name = person1.name
 print("Person Name:", person_name)
 
+
+# COMMAND ----------
+
+def example_function():
+    x = 10  # This is a local variable
+    print(x)
+
+example_function()
+# print(x)  # This would result in an error since x is not defined outside the function
+
+# COMMAND ----------
+
+y = 20  # This is a global variable
+
+def another_function():
+    global y  # Using the global keyword to access the global variable
+    print(y)
+
+another_function()
+print(y)  # This would print the global variable y
