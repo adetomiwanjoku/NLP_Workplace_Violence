@@ -129,10 +129,6 @@ print(embeddings1.shape)
 
 # COMMAND ----------
 
-embeddings[0]
-
-# COMMAND ----------
-
 # MAGIC %md
 # MAGIC # Define cosine similarity 
 
@@ -155,24 +151,33 @@ threshold = 0.55
 # COMMAND ----------
 
 
+# Define a time window duration of 90 minutes
 time_window_duration = timedelta(minutes=90)
 
-
+# Initialize a list to store indices of similar reports
 similar_reports_indices = [
-        (i, j)
-        for i in range(len(sentences_from_file1))
-        for j in range(i + 1, len(sentences_from_file1))
-        if (
-            (similarity_matrix[i, j] > threshold) and
-            ((df1['Bus Route'][i] == df1['Bus Route'][j]) or (df1['Location'][i] == df1['Location'][j])) and
-            (df1['Incident_Date'][i] == df1['Incident_Date'][j]) and 
-            (df1['URN'][i] != df1['URN'][j]) and
-            ((df1['DIR'][i] == 'DIR' and df1['IRIS'][j] == 'IRIS') or
-             (df1['IRIS'][i] == 'IRIS' and df1['DIR'][j] == 'DIR')) and
-            (abs(pd.to_datetime(str(df1['Incident_Date'][i]) + ' ' + str(df1['Time'][i])) -
-                 pd.to_datetime(str(df1['Incident_Date'][j]) + ' ' + str(df1['Time'][j]))) <= time_window_duration)
-        )
-    ]
+    # Nested loop to compare each pair of sentences
+    (i, j)
+    for i in range(len(sentences_from_file1))
+    for j in range(i + 1, len(sentences_from_file1))
+    if (
+        # Check if the similarity between sentences is above a certain threshold
+        (similarity_matrix[i, j] > threshold) and
+        # Check if the reports are related by either Bus Route or Location
+        ((df1['Bus Route'][i] == df1['Bus Route'][j]) or (df1['Location'][i] == df1['Location'][j])) and
+        # Check if the reports have the same Incident Date
+        (df1['Incident_Date'][i] == df1['Incident_Date'][j]) and 
+        # Check if the reports have different URN (Unique Reference Numbers)
+        (df1['URN'][i] != df1['URN'][j]) and
+        # Check if the reports are of opposite directions (DIR and IRIS)
+        ((df1['DIR'][i] == 'DIR' and df1['IRIS'][j] == 'IRIS') or
+         (df1['IRIS'][i] == 'IRIS' and df1['DIR'][j] == 'DIR')) and
+        # Check if the time difference between reports is within the defined time window
+        (abs(pd.to_datetime(str(df1['Incident_Date'][i]) + ' ' + str(df1['Time'][i])) -
+             pd.to_datetime(str(df1['Incident_Date'][j]) + ' ' + str(df1['Time'][j]))) <= time_window_duration)
+    )
+]
+
 
 
 # COMMAND ----------
@@ -193,8 +198,12 @@ similar_reports_df = pd.DataFrame([
         'Location': df1['Location'][i],
         'Bus_Route': df1['Bus Route'][i],
         'Date': df1['Incident_Date'][i],
-        'Incident_Time': df1['Time'][i],  # Include the Time column in the output DataFrame
-        'Incident_Time_Duplicate' : df1['Time'][j]
+        'Incident_Time': df1['Time'][i],
+        'Incident_Time_Duplicate': df1['Time'][j],
+        'Report_Type': 'DIR' if df1['DIR'][i] == 'DIR' else 'IRIS' if df1['IRIS'][i] == 'IRIS' else None,
+        'Report_Type_Duplicate': 'DIR' if df1['DIR'][j] == 'DIR' else 'IRIS' if df1['IRIS'][j] == 'IRIS' else None,
+        'URN': df1['URN'][i],  # Add URN number
+        'URN_Duplicate' : df1['URN'][j]
     }
     for i, j in similar_reports_indices
 ])
@@ -202,9 +211,6 @@ similar_reports_df = pd.DataFrame([
 
 
 
-# Add new index columns for each file index that adds two to the existing index
-similar_reports_df['Row_Num'] = similar_reports_df['File1_Index'] + 2
-similar_reports_df['Row_Num_Duplicate'] = similar_reports_df['File2_Index'] + 2
 
 
 
@@ -231,12 +237,11 @@ similar_reports_df['Is_Duplicate'] = ''
 # COMMAND ----------
 
 # Reorder columns with the new index as the first column
-similar_reports_df = similar_reports_df[['Incident_Time','Incident_Time_Duplicate' ,'Row_Num', 'Row_Num_Duplicate','Incident', 'Incident_Duplicate','Similarity_Score_Percent', 'Location', 'Bus_Route', 'Is_Duplicate']]
+similar_reports_df = similar_reports_df[[ 'URN', 'URN_Duplicate', 'Report_Type', 'Report_Type_Duplicate','Incident_Time','Incident_Time_Duplicate' ,'Incident', 'Incident_Duplicate','Similarity_Score_Percent', 'Location', 'Bus_Route', 'Is_Duplicate']]
 
 # COMMAND ----------
 
-display(similar_reports_df)
-
+similar_reports_df.head()
 
 # COMMAND ----------
 
