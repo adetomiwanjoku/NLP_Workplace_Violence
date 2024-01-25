@@ -174,25 +174,25 @@ similar_reports_indices = [
 # COMMAND ----------
 
 
-# Create a DataFrame for similar reports
+# Create a DataFrame for similar reports with Bus_Route column
 similar_reports_df = pd.DataFrame([
     {
         'File1_Index': i,
         'File2_Index': j,
-        'Description': sentences_from_file1[i],
-        'Duplicate': sentences_from_file1[j],
+        'Incident': sentences_from_file1[i],
+        'Incident_Duplicate': sentences_from_file1[j],
         'Similarity_Score': similarity_matrix[i, j],
-        'Location': df1['LOCATION'].iloc[i],
-        'Incident_Time': df1['Time'][i],  # Include the Time column in the output DataFrame
-        'Incident_Time_Duplicate' : df1['Time'][j]
+        'Location': df1['LOCATION'][i],
+        'Date': df1['Incident_Date'][i],
+        'Incident_Time': df1['Time'][i],
+        'Incident_Time_Duplicate': df1['Time'][j],
+        'Report_Type': 'EIRF' if df1['EIRF'][i] == 'X' else 'WAASB',
+        'Report_Type_Duplicate': 'EIRF' if df1['EIRF'][j] == 'X' else 'WAASB',
+        'Reference_Number': df1['Reference_Number'][i],  # Add URN number
+        'Reference_Number_Duplicate': df1['Reference_Number'][j]
     }
     for i, j in similar_reports_indices
 ])
-
-# Add new index columns for each file index that adds two to the existing index 
-similar_reports_df['Row_Num'] = similar_reports_df['File1_Index'] + 2
-similar_reports_df['Row_Num_Duplicate'] = similar_reports_df['File2_Index'] + 2
-
 
 
 
@@ -205,31 +205,13 @@ similar_reports_df['Row_Num_Duplicate'] = similar_reports_df['File2_Index'] + 2
 
 # COMMAND ----------
 
-# Drop the old file index columns
-similar_reports_df = similar_reports_df.drop(['File1_Index', 'File2_Index'], axis=1)
-
-
-# COMMAND ----------
-
-# Add a column called 'Duplicate_Reference_Number'
-similar_reports_df['Duplicate_Reference_Number'] = similar_reports_df['Row_Num_Duplicate'].apply(
-    # For each file2_index, get the 'Reference_Number' from df1 at index (file2_index - 2)
-    lambda file2_index: df1.iloc[file2_index - 2]['Reference_Number']
-)
-
-# Add an empty column called 'Is_Duplicate'
-similar_reports_df['Is_Duplicate'] = ''
-
-
-# COMMAND ----------
-
 similar_reports_df['Similarity_Score_Percent'] = (similar_reports_df['Similarity_Score'] * 100).round()
 
 
 # COMMAND ----------
 
 # Reorder columns with the new index as the first column
-similar_reports_df = similar_reports_df[['Row_Num', 'Row_Num_Duplicate','Incident_Time','Incident_Time_Duplicate', 'Description', 'Duplicate','Location', 'Similarity_Score_Percent', 'Is_Duplicate']]
+similar_reports_df = similar_reports_df[['Reference_Number', 'Reference_Number_Duplicate', 'Report_Type', 'Report_Type_Duplicate','Incident_Time','Incident_Time_Duplicate', 'Incident', 'Incident_Duplicate','Location', 'Similarity_Score_Percent']]
 
 # COMMAND ----------
 
