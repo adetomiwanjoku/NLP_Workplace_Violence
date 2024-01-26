@@ -140,7 +140,7 @@ df1 = df1.reset_index(drop=True)
 similarity_matrix = cosine_similarity(embeddings1)
 
 # Set similarity threshold
-threshold = 0.55
+threshold = 0.60
 
 # COMMAND ----------
 
@@ -149,7 +149,7 @@ threshold = 0.55
 
 # COMMAND ----------
 
-time_window_duration = timedelta(minutes=30)
+time_window_duration = timedelta(minutes=20)
 # Find indices of similar reports above the threshold with the same location, same incident date and different reference number
 similar_reports_indices = [
     (i, j)

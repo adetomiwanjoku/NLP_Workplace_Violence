@@ -23,7 +23,6 @@
 # Handling division by zero
 numerator = 10
 denominator = 0
-
 try:
     result = numerator / denominator
 except ZeroDivisionError:
@@ -32,7 +31,14 @@ else:
     print("Result:", result)
 finally:
     print("This block always executes.")
+print('I got there')
 
+# COMMAND ----------
+
+numerator = 10
+denominator = 0
+result = numerator / denominator
+print('I got there')
 
 # COMMAND ----------
 
@@ -40,17 +46,19 @@ finally:
 numbers = [1, 2, 3, 4, 5, 6]
 
 for num in numbers:
+    print(num)
     if num == 4:
         print("Number found! Breaking the loop.")
         break
-    print(num)
+    
 
 
 # COMMAND ----------
 
 # Skip the iteration when a specific condition is met
-numbers = [2, 4, 6, 7, 8, 9]
+numbers = [1, 2, 4, 6, 7, 8, 9, 10]
 for num in numbers:
+    print('Examining',num)
     if num % 2 == 0:
         print("Even number. Skipping.")
         continue
