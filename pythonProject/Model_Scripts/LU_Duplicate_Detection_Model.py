@@ -40,16 +40,20 @@ from datetime import timedelta
 
 # COMMAND ----------
 
-df1 = pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Data/London_Underground_Workplace_Violence_Incidents.csv', encoding= 'latin')
+df1 = pd.read_csv('/dbfs/FileStore/London_Underground_Workplace_Violence_Incidents.csv')
 
 # COMMAND ----------
 
-display(df1)
+df1.shape
+
+# COMMAND ----------
+
+df1
 
 # COMMAND ----------
 
 # Assuming your DataFrame is similar_reports_df
-df1 = df1.rename(columns={'ï»¿Data Ref Num': 'Reference_Number', 'Incident Updated Date' : 'Incident_Date'})
+df1 = df1.rename(columns={'Data Ref Num': 'Reference_Number', 'Incident Updated Date' : 'Incident_Date'})
 
 
 # COMMAND ----------
@@ -212,6 +216,10 @@ similar_reports_df['Similarity_Score_Percent'] = (similar_reports_df['Similarity
 
 # Reorder columns with the new index as the first column
 similar_reports_df = similar_reports_df[['Reference_Number', 'Reference_Number_Duplicate', 'Report_Type', 'Report_Type_Duplicate','Incident_Time','Incident_Time_Duplicate', 'Incident', 'Incident_Duplicate','Location', 'Similarity_Score_Percent']]
+
+# COMMAND ----------
+
+similar_reports_df['Duplicate'] = ''
 
 # COMMAND ----------
 

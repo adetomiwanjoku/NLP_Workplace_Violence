@@ -52,7 +52,7 @@ from datetime import timedelta
 
 # COMMAND ----------
 
-df1 =  pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Data/April_2023_Jan_2024_Surface_Data.csv', low_memory=False)
+df1 = pd.read_csv('/dbfs/FileStore/April_2023_Jan_2024_Surface_Data.csv')
 
 # COMMAND ----------
 
@@ -61,11 +61,7 @@ df1 =  pd.read_csv('/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Vio
 
 # COMMAND ----------
 
-df1.head()
-
-# COMMAND ----------
-
-print("Incident ID:", df1['Incident Date']) # example of a dictionary 
+df1.shape
 
 # COMMAND ----------
 
@@ -79,10 +75,6 @@ df1 = df1.rename(columns={'Bus Route ': 'Bus_Route','Incident Date': 'Incident_D
 # COMMAND ----------
 
 df1['Location'] = df1['Location'].str.title() # Useful as this station names are written each word is capatalised
-
-# COMMAND ----------
-
-df1['Location']
 
 # COMMAND ----------
 
@@ -122,10 +114,6 @@ sentences_from_file1 = [clean_text(sentence, stop_words=stop_words) for sentence
 
 # Encode sentences to obtain embeddings
 embeddings1 = model.encode(sentences_from_file1, convert_to_tensor=True)
-
-# COMMAND ----------
-
-print(embeddings1.shape)
 
 # COMMAND ----------
 
@@ -241,12 +229,4 @@ similar_reports_df = similar_reports_df[[ 'URN', 'URN_Duplicate', 'Report_Type',
 
 # COMMAND ----------
 
-similar_reports_df.head()
-
-# COMMAND ----------
-
-df1.shape
-
-# COMMAND ----------
-
-#similar_reports_df.to_csv('similar_reports_df', index=False)
+similar_reports_df.display(n=2)

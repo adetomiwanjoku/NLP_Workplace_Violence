@@ -14,7 +14,6 @@
 # MAGIC
 # MAGIC
 # MAGIC
-# MAGIC
 # MAGIC %md
 # MAGIC # Control Flow 
 
@@ -104,3 +103,20 @@ def another_function():
 
 another_function()
 print(y)  # This would print the global variable y
+
+# COMMAND ----------
+
+def my_function():
+  print('This is my function')
+
+# COMMAND ----------
+
+def my_function(fname):
+  print(fname + " Refsnes")
+
+# COMMAND ----------
+
+def my_function(**kid):
+  print("His last name is " + kid["lname"])
+
+my_function(fname = "Tobias", lname = "Refsnes")
