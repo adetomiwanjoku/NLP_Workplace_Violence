@@ -83,7 +83,6 @@ df1['Location'] = df1['Location'].str.title() # Useful as this station names are
 
 # COMMAND ----------
 
-#tokenizer = BertTokenizer.from_pretrained('bert-base-multilingual-cased')
 model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
 
 # COMMAND ----------
