@@ -228,15 +228,9 @@ similar_reports_df = similar_reports_df[[ 'URN', 'URN_Duplicate', 'Report_Type',
 
 # COMMAND ----------
 
-similar_reports_df.display(n=2)
+similar_reports_df
 
 # COMMAND ----------
 
-x = 'o'
-
-if x > 10:
-  print("Above ten,")
-  if x > 20:
-    print("and also above 20!")
-  else:
-    print("but not above 20.")
+# Save the DataFrame as a CSV file
+similar_reports_df.to_csv('similar_reports_df', index=False)

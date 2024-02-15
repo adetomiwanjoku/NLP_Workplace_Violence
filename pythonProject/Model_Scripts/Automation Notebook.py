@@ -11,7 +11,7 @@ import json
 import requests
 
 # Specify the file name
-csv_file_name = "trial.csv"
+csv_file_name = "similar_reports_df"
 
 # Your Logic App HTTP trigger URL
 url = "https://prod-21.northeurope.logic.azure.com:443/workflows/735927b7438049a4adeb6dbf350e7baa/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=57blbS72UgObJ2IK-pkaB22RgJMnxzujLoGWUFoAdMQ"
