@@ -56,6 +56,10 @@ df1 = pd.read_csv('/dbfs/FileStore/April_2023_Jan_2024_Surface_Data.csv')
 
 # COMMAND ----------
 
+df1.head()
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC # Data Renaming 
 
@@ -99,7 +103,6 @@ custom_stop_words = {'male', 'female'}
 stop_words.update(custom_stop_words)
 
 # COMMAND ----------
-
 
 # Clean and preprocess sentences
 sentences_from_file1 = [clean_text(sentence, stop_words=stop_words) for sentence in df1['Description'].astype(str).tolist()]
