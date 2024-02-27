@@ -32,6 +32,7 @@ import torch
 import os 
 import numpy
 from datetime import timedelta
+import numpy as np 
 
 # COMMAND ----------
 
@@ -45,10 +46,6 @@ df1 = pd.read_csv('/dbfs/FileStore/London_Underground_Workplace_Violence_Inciden
 # COMMAND ----------
 
 df1.shape
-
-# COMMAND ----------
-
-df1
 
 # COMMAND ----------
 
@@ -223,4 +220,15 @@ similar_reports_df['Duplicate'] = ''
 
 # COMMAND ----------
 
+
+
+# COMMAND ----------
+
 display(similar_reports_df)
+
+# COMMAND ----------
+
+
+# Assuming 'df' is your DataFrame
+similar_reports_df= similar_reports_df[similar_reports_df['Incident'] != 'nan']
+

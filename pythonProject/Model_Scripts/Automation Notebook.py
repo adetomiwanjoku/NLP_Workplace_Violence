@@ -41,7 +41,3 @@ except Exception as e:
 
 
 
-
-# COMMAND ----------
-
-headers={'Content-Type': 'application/json'}
