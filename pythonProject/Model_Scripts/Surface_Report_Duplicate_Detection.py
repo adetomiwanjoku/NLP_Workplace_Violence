@@ -20,18 +20,7 @@
 
 # COMMAND ----------
 
-import os 
 import sys
-
-# COMMAND ----------
-
-path_helper = os.path.join('..','py')
-#path = '/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Model_Scripts/nlp.py'
-sys.path.append(path_helper)
-from nlp import *
-
-# COMMAND ----------
-
 import pandas as pd
 from sentence_transformers import SentenceTransformer, util
 from transformers import BertTokenizer
@@ -47,12 +36,19 @@ from datetime import timedelta
 
 # COMMAND ----------
 
+path_helper = os.path.join('..','py') # import the hand written function that lives in repo
+#path = '/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Model_Scripts/nlp.py'
+sys.path.append(path_helper)
+from nlp import *
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC # Read in the data
 
 # COMMAND ----------
 
-df1 = pd.read_csv('/dbfs/FileStore/April_2023_Jan_2024_Surface_Data.csv')
+df1 = pd.read_csv('/dbfs/FileStore/April_2023_Jan_2024_Surface_Data.csv') # read in the WVA file 
 
 # COMMAND ----------
 
@@ -87,7 +83,7 @@ df1['Location'] = df1['Location'].str.title() # Useful as this station names are
 
 # COMMAND ----------
 
-model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2') 
+model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2') # load in the pre-trained nlp model 
 
 # COMMAND ----------
 
@@ -96,15 +92,15 @@ model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
 
 # COMMAND ----------
 
-stop_words = set(stopwords.words('english'))
-custom_stop_words = {'male', 'female'}
+stop_words = set(stopwords.words('english')) # define the stop words to be removed 
+custom_stop_words = {'male', 'female'} # add these two words as well 
 
 # Combine standard English stopwords and custom stopwords
 stop_words.update(custom_stop_words)
 
 # COMMAND ----------
 
-# Clean and preprocess sentences
+# Clean and preprocess sentences check the handwritten function in the repo in the py folder 
 sentences_from_file1 = [clean_text(sentence, stop_words=stop_words) for sentence in df1['Description'].astype(str).tolist()]
 
 # COMMAND ----------
@@ -114,7 +110,7 @@ sentences_from_file1 = [clean_text(sentence, stop_words=stop_words) for sentence
 
 # COMMAND ----------
 
-# Encode sentences to obtain embeddings
+# Encode sentences to obtain embeddings which give words numerical representations 
 embeddings1 = model.encode(sentences_from_file1, convert_to_tensor=True)
 
 # COMMAND ----------
@@ -126,9 +122,9 @@ embeddings1 = model.encode(sentences_from_file1, convert_to_tensor=True)
 
 
 # Reset the index of df1
-df1 = df1.reset_index(drop=True)
+df1 = df1.reset_index(drop=True
 
-similarity_matrix = cosine_similarity(embeddings1)
+similarity_matrix = cosine_similarity(embeddings1) # mathematical technique which calculates the distances of the embeddings 
 
 # Set similarity threshold
 threshold = 0.55
@@ -180,30 +176,23 @@ similar_reports_indices = [
 # Create a DataFrame for similar reports with Bus_Route column
 similar_reports_df = pd.DataFrame([
     {
-        'File1_Index': i,
-        'File2_Index': j,
-        'Incident': sentences_from_file1[i],
-        'Incident_Duplicate': sentences_from_file1[j],
-        'Similarity_Score': similarity_matrix[i, j],
-        'Location': df1['Location'][i],
-        'Bus_Route': df1['Bus Route'][i],
-        'Date': df1['Incident_Date'][i],
-        'Incident_Time': df1['Time'][i],
-        'Incident_Time_Duplicate': df1['Time'][j],
-        'Report_Type': 'DIR' if df1['DIR'][i] == 'DIR' else 'IRIS' if df1['IRIS'][i] == 'IRIS' else None,
-        'Report_Type_Duplicate': 'DIR' if df1['DIR'][j] == 'DIR' else 'IRIS' if df1['IRIS'][j] == 'IRIS' else None,
-        'URN': df1['URN'][i],  # Add URN number
-        'URN_Duplicate' : df1['URN'][j]
+        'File1_Index': i,  # Index of the incident in the first file
+        'File2_Index': j,  # Index of the duplicate incident in the second file
+        'Incident': sentences_from_file1[i],  # Text of the incident in the first file
+        'Incident_Duplicate': sentences_from_file1[j],  # Text of the duplicate incident in the second file
+        'Similarity_Score': similarity_matrix[i, j],  # Similarity score between the two incidents
+        'Location': df1['Location'][i],  # Location of the incident in the first file
+        'Bus_Route': df1['Bus Route'][i],  # Bus route associated with the incident in the first file
+        'Date': df1['Incident_Date'][i],  # Date of the incident in the first file
+        'Incident_Time': df1['Time'][i],  # Time of the incident in the first file
+        'Incident_Time_Duplicate': df1['Time'][j],  # Time of the duplicate incident in the second file
+        'Report_Type': 'DIR' if df1['DIR'][i] == 'DIR' else 'IRIS' if df1['IRIS'][i] == 'IRIS' else None,  # Report type of the incident in the first file
+        'Report_Type_Duplicate': 'DIR' if df1['DIR'][j] == 'DIR' else 'IRIS' if df1['IRIS'][j] == 'IRIS' else None,  # Report type of the duplicate incident in the second file
+        'URN': df1['URN'][i],  # URN number associated with the incident in the first file
+        'URN_Duplicate' : df1['URN'][j]  # URN number associated with the duplicate incident in the second file
     }
-    for i, j in similar_reports_indices
+    for i, j in similar_reports_indices  # Loop through the indices of similar reports
 ])
-
-
-
-
-
-
-
 
 
 # COMMAND ----------
@@ -212,7 +201,7 @@ display(similar_reports_df)
 
 # COMMAND ----------
 
-similar_reports_df['Similarity_Score_Percent'] = (similar_reports_df['Similarity_Score'] * 100).round()
+similar_reports_df['Similarity_Score_Percent'] = (similar_reports_df['Similarity_Score'] * 100).round() #make the similarity score a percentage
 
 # COMMAND ----------
 
