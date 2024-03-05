@@ -1,11 +1,4 @@
 # Databricks notebook source
-import pandas as pd
-import requests
-import json
-import base64
-
-# COMMAND ----------
-
 import base64
 import json
 import requests
