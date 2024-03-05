@@ -36,7 +36,7 @@ from datetime import timedelta
 
 # COMMAND ----------
 
-path_helper = os.path.join('..','py') # import the hand written function that lives in repo
+path_helper = os.path.join('..','py') # import the hand written function that lives in repo under py folder 
 #path = '/Workspace/Repos/adetomiwanjoku@tfl.gov.uk/NLP_Workplace_Violence/pythonProject/Model_Scripts/nlp.py'
 sys.path.append(path_helper)
 from nlp import *
