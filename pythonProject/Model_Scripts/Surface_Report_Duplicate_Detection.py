@@ -52,7 +52,7 @@ df1 = pd.read_csv('/dbfs/FileStore/April_2023_Jan_2024_Surface_Data.csv') # read
 
 # COMMAND ----------
 
-df1.head()
+display(df1)
 
 # COMMAND ----------
 
@@ -122,7 +122,7 @@ embeddings1 = model.encode(sentences_from_file1, convert_to_tensor=True)
 
 
 # Reset the index of df1
-df1 = df1.reset_index(drop=True
+df1 = df1.reset_index(drop=True)
 
 similarity_matrix = cosine_similarity(embeddings1) # mathematical technique which calculates the distances of the embeddings 
 

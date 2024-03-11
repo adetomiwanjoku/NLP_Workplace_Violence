@@ -49,7 +49,7 @@ from nlp import *
 
 # COMMAND ----------
 
-df1 = pd.read_csv('/dbfs/FileStore/London_Underground_Workplace_Violence_Incidents.csv') # read int he WVA data 
+df1 = pd.read_csv('/dbfs/FileStore/London_Underground_Workplace_Violence_Incidents.csv') # read in the WVA data 
 
 # COMMAND ----------
 
