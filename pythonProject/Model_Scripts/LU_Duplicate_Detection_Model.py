@@ -1,5 +1,10 @@
 # Databricks notebook source
 # MAGIC %md
+# MAGIC # Get data from Oracle Database in PowerBI
+
+# COMMAND ----------
+
+# MAGIC %md
 # MAGIC # Install Packages
 
 # COMMAND ----------
