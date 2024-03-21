@@ -1,10 +1,5 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # Get data from Oracle Database in PowerBI
-
-# COMMAND ----------
-
-# MAGIC %md
 # MAGIC # Install Packages
 
 # COMMAND ----------
@@ -39,6 +34,10 @@ import numpy
 from datetime import timedelta
 import numpy as np 
 import sys 
+import base64
+import json
+import requests
+
 
 # COMMAND ----------
 
@@ -54,11 +53,27 @@ from nlp import *
 
 # COMMAND ----------
 
-df1 = pd.read_csv('/dbfs/FileStore/London_Underground_Workplace_Violence_Incidents.csv') # read in the WVA data 
+df = pd.read_csv('/dbfs/FileStore/EIRF_Queey.csv')
+
+# COMMAND ----------
+
+df2 = pd.read_csv('/dbfs/FileStore/WAASB.csv')
+
+# COMMAND ----------
+
+df1 = df.append(df2, ignore_index=True)
+
+# COMMAND ----------
+
+#df1 = pd.read_csv('/dbfs/FileStore/London_Underground_Workplace_Violence_Incidents.csv') # read in the WVA data 
 
 # COMMAND ----------
 
 df1.shape
+
+# COMMAND ----------
+
+df1
 
 # COMMAND ----------
 
@@ -108,7 +123,7 @@ stop_words.update(custom_stop_words)
 
 
 # Clean and preprocess sentences using the hand written function that live in py folder
-sentences_from_file1 = [clean_text(sentence) for sentence in df1['DESCRIPTION'].astype(str).tolist()]
+sentences_from_file1 = [clean_text(sentence, stop_words) for sentence in df1['DESCRIPTION'].astype(str).tolist()]
 
 
 # COMMAND ----------
@@ -166,6 +181,10 @@ similar_reports_indices = [
 
 # COMMAND ----------
 
+df1
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC # Creation of the dataframe 
 
@@ -180,7 +199,7 @@ similar_reports_df = pd.DataFrame([
         'Incident_Duplicate': sentences_from_file1[j],  # Text of the duplicate incident in the second file
         'Similarity_Score': similarity_matrix[i, j],  # Similarity score between the two incidents
         'Location': df1['LOCATION'][i],  # Location of the incident in the first file
-        'Date': df1['Incident_Date'][i],  # Date of the incident in the first file
+        'Date': df1['Date'][i],  # Date of the incident in the first file
         'Incident_Time': df1['Time'][i],  # Time of the incident in the first file
         'Incident_Time_Duplicate': df1['Time'][j],  # Time of the duplicate incident in the second file
         'Report_Type': 'EIRF' if df1['EIRF'][i] == 'X' else 'WAASB',  # Report type of the incident in the first file
@@ -213,11 +232,49 @@ similar_reports_df['Duplicate'] = '' #create an empty column called 'Duplicate'
 
 # COMMAND ----------
 
+
+# remove any entries with 'Incident' column which has just nan value
+similar_reports_df= similar_reports_df[similar_reports_df['Incident'] != 'nan']
+
+
+# COMMAND ----------
+
 display(similar_reports_df)
 
 # COMMAND ----------
 
+similar_reports_df.to_csv('similar_reports_df', index=False)
 
-# remove any entries with 'Incident' column which has just nan value
-similar_reports_df= similar_reports_df[similar_reports_df['Incident'] != 'nan']
+
+# COMMAND ----------
+
+
+# Specify the file name
+csv_file_name = "similar_reports_df"
+
+# Your Logic App HTTP trigger URL
+url = "https://prod-21.northeurope.logic.azure.com:443/workflows/735927b7438049a4adeb6dbf350e7baa/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=57blbS72UgObJ2IK-pkaB22RgJMnxzujLoGWUFoAdMQ"
+
+try:
+    # Read the content of the CSV file in binary mode
+    with open(csv_file_name, "rb") as file:
+        # Decode the CSV content to a string
+        csv_content_string = file.read().decode("utf-8")
+
+    # Prepare the JSON payload with decoded CSV content as a string
+    data = {
+        "Message": "Good morning, this is the duplicate list the model has come up with.",
+        "Subject": "Duplicate Detection Model Results",
+        "To": 'adetomiwanjoku@tfl.gov.uk',
+        "Attachment": csv_content_string
+    }
+
+    # Send the POST request with the 'json' parameter
+    response = requests.post(url, data=json.dumps(data), headers={'Content-Type': 'application/json'})
+
+    # Print the response status code
+    print(response.status_code)
+
+except Exception as e:
+    print(f"An error occurred: {str(e)}")
 
