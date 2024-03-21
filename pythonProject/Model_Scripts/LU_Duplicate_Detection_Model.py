@@ -62,7 +62,7 @@ df1.shape
 
 # COMMAND ----------
 
-# Assuming your DataFrame is similar_reports_df
+# Rename columns 
 df1 = df1.rename(columns={'Data Ref Num': 'Reference_Number', 'Incident Updated Date' : 'Incident_Date'})
 
 
