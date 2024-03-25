@@ -46,36 +46,6 @@ from nlp import *
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC # Pull in data from Oracle Database in PowerBI 
-
-# COMMAND ----------
-
-from powerbiclient import Report, models
-
-# Power BI service principal authentication
-power_bi_client_id = '43c07190-f2bf-4157-b524-0ccb9c94a10f'
-power_bi_client_secret = '79608367-577b-4f3f-8d35-2e779077dca7'
-authority = 'https://login.microsoftonline.com/1fbd65bf-5def-4eea-a692-a089c255346b'
-
-
-# Authenticate with Power BI using Azure AD
-client = Report(power_bi_client_id,authority, power_bi_client_secret)
-
-# Retrieve data from Power BI report
-report_id = 'fad2aa01d-e67e-4052-8bf8-55fa7bcd44e4'
-dataset_id = 'f22fbc46-dcb0-4d1c-a9c4-707010df8628'
-table_name = 'WAASB_Query'
-
-# Fetch data from table in the dataset
-rows = client.get_rows(report_id, dataset_id, table_name)
-
-# Process or store data as needed
-print(rows)
-
-
-# COMMAND ----------
-
-# MAGIC %md
 # MAGIC # Read in the data
 
 # COMMAND ----------
