@@ -35,6 +35,9 @@ import os
 import numpy
 from datetime import timedelta
 from powerbiclient import Report
+import base64
+import json
+import requests
 
 # COMMAND ----------
 
@@ -247,7 +250,7 @@ try:
     data = {
         "Message": "Good morning, this is the duplicate list the model has come up with.",
         "Subject": "Duplicate Detection Model Results",
-        "To": 'adetomiwanjoku@tfl.gov.uk',
+        "To": 'adetomiwanjoku@tfl.gov.uk','jakecable@tfl.gov.uk'
         "Attachment": csv_content_string
     }
 
