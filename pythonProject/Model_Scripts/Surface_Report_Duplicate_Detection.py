@@ -53,7 +53,7 @@ from nlp import *
 
 # COMMAND ----------
 
-df1 = pd.read_csv('/dbfs/FileStore/April_2023_Jan_2024_Surface_Data.csv') # read in the WVA file 
+df1 = pd.read_csv('/dbfs/FileStore/Surface_Data') # read in the WVA file 
 
 # COMMAND ----------
 
@@ -234,6 +234,10 @@ similar_reports_df.to_csv('similar_reports_df', index=False)
 
 # COMMAND ----------
 
+display(similar_reports_df)
+
+# COMMAND ----------
+
 # Specify the file name
 csv_file_name = "similar_reports_df"
 
@@ -250,7 +254,7 @@ try:
     data = {
         "Message": "Good morning, this is the duplicate list the model has come up with.",
         "Subject": "Duplicate Detection Model Results",
-        "To": 'adetomiwanjoku@tfl.gov.uk','jakecable@tfl.gov.uk'
+        "To":'adam.mullineux@tfl.gov.uk',
         "Attachment": csv_content_string
     }
 
